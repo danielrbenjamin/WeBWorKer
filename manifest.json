@@ -1,0 +1,61 @@
+{
+   "manifest_version": 3,
+
+   "name": "WeBWorKer",
+   "version": "1.0",
+   "description": "Preview nicely formatted math equations as you type them into WeBWorK answer boxes and check for complete parentheses; Created by Daniel Benjamin based off of WeBWorK MathView by Noah Tajwar and WeBWorK Parentheses Checker by James Yuzawa.",
+   "author": "Daniel Benjamin",
+
+   "minimum_chrome_version": "96",
+
+   "icons": {
+      "16": "icon/icon_16.png",
+      "32": "icon/icon_32.png",
+      "48": "icon/icon_48.png",
+      "128": "icon/icon_128.png"
+   },
+
+   "action": {
+      "default_title": "WeBWorKer",
+      "default_popup": "popup.html",
+      "default_icon": {
+         "16": "icon/icon_16.png",
+         "32": "icon/icon_32.png",
+         "48": "icon/icon_48.png",
+         "128": "icon/icon_128.png"
+      }
+   },
+
+   "background": {
+      "service_worker": "worker.js"
+   },
+
+   "web_accessible_resources": [
+      {
+         "resources": ["lib/katex/fonts/*"],
+         "matches": ["<all_urls>"]
+      }
+   ],
+
+   "permissions": [
+      "activeTab",
+      "declarativeContent",
+      "scripting"
+   ],
+
+   "host_permissions": [
+      "*://*/*"
+   ],
+
+   "content_scripts": [
+      {
+         "matches": ["https://webwork.elearning.ubc.ca/webwork2/*"],
+         "js": ["tampermonkey-script.js"]
+      },
+      {
+         "css": [ "wwstyle.css" ],
+         "js": [ "jquery-1.8.3.min.js", "wwscript.js" ],
+         "matches": [ "*://*/webwork/*", "*://*/webwork2/*" ]
+      }
+   ]
+}
