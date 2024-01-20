@@ -1,0 +1,12 @@
+.mv_mathout
+{
+    display: inline-block;
+    padding: 8px;
+    margin-top: 0px;
+    margin-bottom: 8px;
+    margin-left: 4px;
+    margin-right: 4px;
+    color: #000000;
+    background-color: #dddddd;
+    border-radius: 5px;
+}
