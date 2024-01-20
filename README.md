@@ -2,10 +2,7 @@
 
 A Chrome extension to provide a real-time preview of math entered into WeBWorK text fields, and show whether parentheses are correctly completed.
 
-Based off of [WeBWorKMathView by Noah Tajwar]([url](https://github.com/noaht11/WeBWorKMathView)) and [WeBWorK Parentheses Checker by James Yuzawa](yuzawa-san/webwork-parentheses-checker).
-
-https://github.com/noaht11/WeBWorKMathView
-https://github.com/yuzawa-san/webwork-parentheses-checker
+Based off of [WeBWorKMathView by Noah Tajwar](https://github.com/noaht11/WeBWorKMathView) and [WeBWorK Parentheses Checker by James Yuzawa](yuzawa-san/webwork-parentheses-checker).
 
 # Libraries
 
