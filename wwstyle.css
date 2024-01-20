@@ -1,0 +1,47 @@
+.ww_valid {background:#white}
+.ww_invalid {background:#fcc}
+
+
+.ww_pair0 {color:cyan;}
+.ww_pair1 {color:yellow;}
+.ww_pair2 {color:#0f0;}
+.ww_pair3 {color:brown;}
+.ww_pair4 {color:violet;}
+
+.ww_pairbad {color:red;}
+
+.ww_success {color:#0f0;}
+.ww_fail {color:red;}
+
+#wwchecker-box {
+    position:fixed;
+    bottom:0px;right:0px;
+    padding:8px;
+    background:#123283;
+    color:white;
+    border-top:1px solid #000000;
+    border-left:1px solid #000000;
+    font-size:13px;
+    z-index: 10000;
+    box-shadow: 0px 0px 9px #ccc;
+    font-family: "Trebuchet MS", "Arial", sans-serif;
+}
+
+#wwchecker-floater {
+    display:none;
+    left:0px;
+    top:0px;
+    position:absolute;
+    background:rgba(0,0,0,0.8);
+    border-radius:5px;
+    border:1px solid white;
+    color:white;
+    z-index:9999;
+    padding:5px;
+    font-size:11px;
+    line-height:14px;
+    font-family:Menlo, Consolas, Courier, monospace;
+    text-align:left;
+    overflow-y:none;
+    height:23px;
+}
