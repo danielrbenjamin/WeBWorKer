@@ -13,6 +13,7 @@ Based off of [WeBWorKMathView by Noah Tajwar](https://github.com/noaht11/WeBWorK
 
 This extension makes use of the following open source libraries:
 
+- jQuery 
 - KaTeX
 - MathJax
 	- The WeBWorK platform already uses MathJax to render its own equations, so this extension uses WeBWorK's instance of MathJax
