@@ -3,7 +3,7 @@
 
    "name": "WeBWorKer",
    "version": "1.0",
-   "description": "Preview nicely formatted math equations as you type them into WeBWorK answer boxes and check for complete parentheses; Created by Daniel Benjamin based off of WeBWorK MathView by Noah Tajwar and WeBWorK Parentheses Checker by James Yuzawa.",
+   "description": "Preview nicely formatted math equations as you type them into WeBWorK answer boxes and check for complete parentheses.",
    "author": "Daniel Benjamin",
 
    "minimum_chrome_version": "96",
