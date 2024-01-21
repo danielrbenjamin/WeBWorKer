@@ -29,4 +29,4 @@ This extension makes use of the following open source libraries:
 5. Enable developer mode in the top right hand corner, and then "Load unpacked" in the top-left corner
 ![Screenshot 2024-01-20 221204](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/9c81413a-2950-4614-b633-e377a8442b3b)
 7. Select the inner `WeBWorKer-main` folder
-8. If you select the outer folder, then you will get an error
+8. Done!
