@@ -1,4 +1,5 @@
-![Screenshot 2024-01-20 221204](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/9c81413a-2950-4614-b633-e377a8442b3b)
+![Picture2](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/ab47464a-84be-4777-bcfc-356b6ff6d949)
+![Picture1](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/16f11cde-4f0a-4c99-b94b-255a88f73ae6)
 
 # WeBWorKer
 
