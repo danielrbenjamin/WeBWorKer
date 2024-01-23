@@ -1,6 +1,9 @@
 ![Thumbnail](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/d64ee3f4-aa98-43c0-995e-bbc55a2fe8f9)
+![Screenshot 1](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/08788443-9da4-43b4-ac62-391ca703abd6)
+![Screenshot 3](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/b2b10918-adcc-45b2-a0bd-bbe9dcb3db6a)
+![Screenshot 2](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/77519eb8-f8cc-49e6-be11-4b89fd0c144d)
+![Screenshot 5](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/b2886269-2fba-429a-8159-5d868ff77de5)
 ![Frame 1](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/1499cbce-1159-4756-b054-3d3243ef099c)
-
 
 # WeBWorKer
 
