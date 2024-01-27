@@ -95,6 +95,7 @@ var webworkSetup = function () {
             piazzaButton.style.backgroundImage = "none";
 
             
+
             // Add event listener to copy text from the div with id "problem_body" when clicked
             piazzaButton.addEventListener("click", function () {
                 // Get the element with id "problem_body"
@@ -104,7 +105,7 @@ var webworkSetup = function () {
                 if (breadcrumbElement) {
                     // Copy the content to clipboard
                     var textarea = document.createElement("textarea");
-                    textarea.value = breadcrumbElement.textContent;
+                    textarea.value = "q" + breadcrumbElement.textContent;
                     document.body.appendChild(textarea);
                     textarea.select();
                     document.execCommand("copy");
