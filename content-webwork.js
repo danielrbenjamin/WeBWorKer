@@ -123,7 +123,7 @@ var webworkSetup = function () {
             googleSearchButton.id = "googleSearchButton";
             googleSearchButton.className = "btn btn-secondary mb-1"; // Adjust the class as needed
             googleSearchButton.type = "button";
-            googleSearchButton.value = "Search Google";
+            googleSearchButton.value = "Online Resources";
             googleSearchButton.style.backgroundColor = "#731DD8";
             googleSearchButton.style.backgroundImage = "none";
 
