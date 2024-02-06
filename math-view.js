@@ -46,25 +46,34 @@ var MathView = new function () {
         // Flag the input as having a MathView attached
         inputSource.setAttribute(this.MV_ATTR_ATTACHED, id);
 
-        // Attach the onkeyup event
+        // Attach the oninput event
         inputSource.addEventListener("input", function () {
-            MathView.updateMath(id, this.value);
-        });
+            var inputValue = this.value;
+            MathView.updateMath(id, inputValue);
 
-        // Create two math containers (a redundant one for while the other is updating if we're using MathJax)
-        var mathOutA = createMathOut(id, "a", inputSource.value);
-        var mathOutB = createMathOut(id, "b", inputSource.value);
-        mathOutB.style.display = "none";
+        // Toggle MathView visibility based on input content
+            if (inputValue.trim() !== "") {
+                mathOut.style.display = "inline-block";
+            } else {
+                mathOut.style.display = "none";
+            }
+    });
 
-        // Parent <div> for the two math containers
-        var mathOut = document.createElement("div");
-        mathOut.style.display = "inline-block";
+    // Create two math containers (a redundant one for while the other is updating if we're using MathJax)
+    var mathOutA = createMathOut(id, "a", inputSource.value);
+    var mathOutB = createMathOut(id, "b", inputSource.value);
+    mathOutB.style.display = "none";
 
-        mathOut.appendChild(mathOutA);
-        mathOut.appendChild(mathOutB);
+    // Parent <div> for the two math containers
+    var mathOut = document.createElement("div");
+    mathOut.style.display = "none"; // Initially hide MathView
 
-        return mathOut;
-    };
+    mathOut.appendChild(mathOutA);
+    mathOut.appendChild(mathOutB);
+
+    return mathOut;
+};
+
 
     var getMathOut = function (id, subIndex) {
         return document.getElementById(generateMathViewId(id, subIndex));
