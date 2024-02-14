@@ -2,8 +2,7 @@
 ![Frame 1](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/1499cbce-1159-4756-b054-3d3243ef099c)
 
 [Buy me a Coffee!
-]([url](https://www.buymeacoffee.com/danielrbenjamin
-))
+]([url](https://www.buymeacoffee.com/danielrbenjamin))
 
 # WeBWorKer
 
