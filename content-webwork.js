@@ -1,7 +1,5 @@
 console.log("[WeBWorK MathView] content-webwork.js");
 
-
-
 // Prepare function to set up MathView on a webwork page
 var webworkSetup = function () {
     var MATH_FONT = {
@@ -148,11 +146,26 @@ var webworkSetup = function () {
                 }
             });
 
+            // Create "Buy Me a Coffee Button" button
+            var buyMeACoffeeButton = document.createElement("input");
+            buyMeACoffeeButton.id = "buyMeACoffeeButton";
+            buyMeACoffeeButton.className = "btn btn-secondary mb-1"; // Adjust the class as needed
+            buyMeACoffeeButton.type = "button";
+            buyMeACoffeeButton.value = "🍕";
+            buyMeACoffeeButton.style.backgroundColor = "#182d6f";
+            buyMeACoffeeButton.style.backgroundImage = "none";
+
+            // Add event listener to open the Buy Me a Coffee link when clicked
+            buyMeACoffeeButton.addEventListener("click", function () {
+                window.open("https://www.buymeacoffee.com/danielrbenjamin", "_blank");
+            });
+
 
             // Insert buttons
             previewAnswers.parentNode.insertBefore(clearAnswers, null);
             previewAnswers.parentNode.insertBefore(piazzaButton, null);
             piazzaButton.parentNode.insertBefore(googleSearchButton, piazzaButton.nextSibling);
+            googleSearchButton.parentNode.insertBefore(buyMeACoffeeButton, googleSearchButton.nextSibling);
         }
     }
 
