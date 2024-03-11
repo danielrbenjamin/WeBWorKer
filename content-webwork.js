@@ -145,7 +145,7 @@ var webworkSetup = function () {
                     window.open("https://www.google.com/search?q=" + encodeURIComponent(problemBody.textContent), "_blank");
                 }
             });
-
+/*
             // Create "Buy Me a Coffee Button" button
             var buyMeACoffeeButton = document.createElement("input");
             buyMeACoffeeButton.id = "buyMeACoffeeButton";
@@ -160,12 +160,13 @@ var webworkSetup = function () {
                 window.open("https://www.buymeacoffee.com/danielrbenjamin", "_blank");
             });
 
+*/
 
             // Insert buttons
             previewAnswers.parentNode.insertBefore(clearAnswers, null);
             previewAnswers.parentNode.insertBefore(piazzaButton, null);
             piazzaButton.parentNode.insertBefore(googleSearchButton, piazzaButton.nextSibling);
-            googleSearchButton.parentNode.insertBefore(buyMeACoffeeButton, googleSearchButton.nextSibling);
+            // googleSearchButton.parentNode.insertBefore(buyMeACoffeeButton, googleSearchButton.nextSibling);
         }
     }
 
