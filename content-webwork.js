@@ -190,3 +190,35 @@ var webworkSetup = function () {
 };
 
 webworkSetup();
+
+let confirmationEnabled = true;
+
+function confirmSubmit() {
+  const scoreSummary = document.getElementById('score_summary');
+  const hasUnlimited = scoreSummary && scoreSummary.innerText.toLowerCase().includes('unlimited');
+
+  return confirmationEnabled && !hasUnlimited ? confirm("LIMITED ATTEMPTS!! Are you sure you want to submit?") : true;
+}
+
+function addConfirmationListener() {
+  const forms = document.querySelectorAll('form');
+  forms.forEach(form => {
+    form.addEventListener('submit', (event) => {
+      const submitButton = form.querySelector('[name="submitAnswers"]');
+      if (submitButton && !confirmSubmit()) {
+        event.preventDefault();
+      }
+    });
+  });
+}
+
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    if (request.toggleConfirmation) {
+      confirmationEnabled = !confirmationEnabled;
+      sendResponse({ confirmationEnabled });
+    }
+  }
+);
+
+addConfirmationListener();
