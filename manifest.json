@@ -2,7 +2,7 @@
    "manifest_version": 3,
 
    "name": "WeBWorKer",
-   "version": "1.4",
+   "version": "1.4.1",
    "description": "Preview nicely formatted math equations as you type them into WeBWorK answer boxes and check for complete parentheses.",
    "author": "Daniel Benjamin",
 
