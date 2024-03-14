@@ -20,16 +20,18 @@ function isValid($obj) {
     var expr = $obj.val();
     var floater = $("#wwchecker-floater");
 
-    if (checkerActive && expr !== '') {
-        // Validation logic for matching parentheses
-        var validationOutput = checkMatchingBrackets(expr);
-
-        if (validationOutput[0]) {
+    if (checkerActive && (expr !== '' || $obj.is(':focus'))) {
+        if (expr.match(/[\(\[\{\)\]\}]/)) {
             floater.show();
-            showValidFloater(floater, validationOutput[2]);
+            // Validation logic for matching parentheses
+            var validationOutput = checkMatchingBrackets(expr);
+            if (validationOutput[0]) {
+                showValidFloater(floater, validationOutput[2]);
+            } else {
+                showInvalidFloater(floater, validationOutput[2], validationOutput[1]);
+            }
         } else {
-            floater.show();
-            showInvalidFloater(floater, validationOutput[2], validationOutput[1]);
+            floater.hide();
         }
     } else {
         floater.hide();
@@ -140,6 +142,7 @@ $(document).ready(function () {
 
         inputElement.focus(function () {
             updateFloaterPosition(inputElement);
+            isValid(inputElement);
         });
 
         inputElement.blur(function () {
