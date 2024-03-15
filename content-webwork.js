@@ -1,4 +1,4 @@
-console.log("[WeBWorK MathView] content-webwork.js");
+console.log("[WeBWorKer] content-webwork.js");
 
 // Prepare function to set up MathView on a webwork page
 var webworkSetup = function () {
@@ -16,7 +16,7 @@ var webworkSetup = function () {
     }
 
     var applyToInputs = function () {
-        console.log("[WeBWorK MathView] Inserting MathView elements");
+        console.log("[WeBWorKer] Inserting MathView elements");
         var inputs = retrieveTextInputs();
         for (var i = 0; i < inputs.length; i++) {
             var theInput = inputs[i];
@@ -38,15 +38,15 @@ var webworkSetup = function () {
                 theInput.style.fontFamily = MATH_FONT.family;
             }
         }
-        console.log("[WeBWorK MathView] Rendered");
+        console.log("[WeBWorKer] Rendered");
     }
 
     var createClearAnswers = function () {
-        console.log("[WeBWorK MathView] Creating Clear Answers button");
+        console.log("[WeBWorKer] Creating Clear Answers button");
 
         // Check if the button already exists
         if (document.getElementById("clearAnswersButton")) {
-            console.log("[WeBWorK MathView] Clear Answers button already attached");
+            console.log("[WeBWorKer] Clear Answers button already attached");
             return;
         }
 
@@ -179,9 +179,9 @@ var webworkSetup = function () {
     var selectInputs = retrieveSelectInputs();
 
     if (textInputs.length == 0 && selectInputs.length == 0) {
-        console.log("[WeBWorK MathView] DOM not available. Waiting to insert MathView elements...");
+        console.log("[WeBWorKer] DOM not available. Waiting to insert MathView elements...");
         document.addEventListener("DOMContentLoaded", function () {
-            console.log("[WeBWorK MathView] DOM available");
+            console.log("[WeBWorKer] DOM available");
             main();
         })
     }
@@ -223,3 +223,15 @@ chrome.runtime.onMessage.addListener(
 );
 
 addConfirmationListener();
+
+(function() {
+    'use strict';
+
+    // Select all elements with the specified class
+    var targetElements = document.querySelectorAll('.btn.btn-sm.btn-secondary.codeshard-btn');
+
+    // Iterate through each element and change its class
+    targetElements.forEach(function(element) {
+        element.className = 'input-group d-inline-flex flex-nowrap w-auto mv-container';
+    });
+})();
