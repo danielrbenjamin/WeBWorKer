@@ -235,3 +235,58 @@ addConfirmationListener();
         element.className = 'input-group d-inline-flex flex-nowrap w-auto mv-container';
     });
 })();
+
+// Add previous answers button
+(function() {
+    'use strict';
+
+    // Select all elements with the specified class
+    var targetElements = document.querySelectorAll('.btn.btn-sm.btn-secondary.codeshard-btn');
+
+    // Iterate through each element and change its class
+    targetElements.forEach(function(element) {
+        element.className = 'input-group d-inline-flex flex-nowrap w-auto mv-container';
+    });
+
+    // Add event listener to create the "Previous Answer" button
+    var createPreviousAnswerButton = function() {
+        console.log("[WeBWorKer] Creating Previous Answer button");
+
+        // Check if the button already exists
+        if (document.getElementById("previousAnswerButton")) {
+            console.log("[WeBWorKer] Previous Answer button already attached");
+            return;
+        }
+
+        // Create "Previous Answer" button
+        var previousAnswerButton = document.createElement("input");
+        previousAnswerButton.id = "previousAnswerButton";
+        previousAnswerButton.className = "btn btn-secondary mb-1";
+        previousAnswerButton.type = "button";
+        previousAnswerButton.value = "Previous Answer";
+
+        // Initialize a variable to track the visibility state
+        var isVisible = false;
+
+        previousAnswerButton.addEventListener("click", function () {
+            var previousAnswers = document.querySelectorAll('[name*="previous_AnSwEr"]');
+            previousAnswers.forEach(function(answer) {
+                // Toggle visibility
+                answer.type = isVisible ? "hidden" : "text";
+                // Change text color to red
+                answer.style.color = isVisible ? "black" : "red";
+            });
+            
+            // Toggle the visibility state
+            isVisible = !isVisible;
+        });
+
+        // Insert the "Previous Answer" button
+        var clearAnswersButton = document.getElementById("clearAnswersButton");
+        if (clearAnswersButton) {
+            clearAnswersButton.parentNode.insertBefore(previousAnswerButton, clearAnswersButton.nextSibling);
+        }
+    };
+
+    createPreviousAnswerButton();
+})();
