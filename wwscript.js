@@ -133,7 +133,7 @@ $(document).ready(function () {
     checkerActive = (localStorage.wwactive == 'active');
 
     // bind events to answer boxes
-    $('input[id^=AnSwEr], input[id^=MuLtIaNsWeR]').each(function () {
+    $('input[id*=AnSwEr], input[id*=MuLtIaNsWeR]').each(function () {
         var inputElement = $(this);
 
         inputElement.on('input', function () {
