@@ -1,4 +1,4 @@
-console.log("[WeBWorK MathView] math-view.js");
+console.log("[WeBWorKer] math-view.js");
 
 var MathView = new function () {
 
