@@ -1,4 +1,4 @@
-console.log("[WeBWorK MathView] ext-config.js");
+console.log("[WeBWorKer] ext-config.js");
 
 var ExtConfig = new function () {
 
