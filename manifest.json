@@ -2,7 +2,7 @@
    "manifest_version": 3,
 
    "name": "WeBWorKer",
-   "version": "1.4",
+   "version": "1.4.1",
    "description": "Preview nicely formatted math equations as you type them into WeBWorK answer boxes and check for complete parentheses.",
    "author": "Daniel Benjamin",
 
@@ -50,7 +50,7 @@
    "content_scripts": [
       {
          "css": [ "wwstyle.css" ],
-         "js": [ "jquery-1.8.3.min.js", "wwscript.js" ],
+         "js": [ "lib/jquery/jquery-1.8.3.min.js", "wwscript.js" ],
          "matches": [ "*://*/webwork/*", "*://*/webwork2/*" ]
       }
    ]
