@@ -236,6 +236,7 @@ addConfirmationListener();
     });
 })();
 
+/*
 // Add previous answers button
 (function() {
     'use strict';
@@ -290,3 +291,4 @@ addConfirmationListener();
 
     createPreviousAnswerButton();
 })();
+*/
