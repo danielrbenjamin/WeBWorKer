@@ -3,7 +3,7 @@
 
    "name": "WeBWorKer",
    "version": "1.4.1",
-   "description": "Preview nicely formatted math equations as you type them into WeBWorK answer boxes and check for complete parentheses.",
+   "description": "Add additional helpful features to WeBWorK, including real-time preview, parentheses checker, limited attempts answer confirmation, and more!",
    "author": "Daniel Benjamin",
 
    "minimum_chrome_version": "96",
