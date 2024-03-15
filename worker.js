@@ -1,4 +1,4 @@
-console.log("[WeBWorK MathView] worker.js");
+console.log("[WeBWorKer] worker.js");
 
 try {
     importScripts("ext-config.js");
