@@ -3,7 +3,7 @@
 
    "name": "WeBWorKer",
    "version": "1.4.1",
-   "description": "Add additional features to WeBWorK like real-time preview, parentheses checker, limited attempts answer confirmation, and more!",
+   "description": "Add additional features to WeBWorK like real-time preview, parentheses checker, limited attempts warning, and more!",
    "author": "Daniel Benjamin",
 
    "minimum_chrome_version": "96",
