@@ -49,10 +49,6 @@
 
    "content_scripts": [
       {
-         "matches": [ "*://*/webwork/*", "*://*/webwork2/*" ],
-         "js": ["tampermonkey-script.js"]
-      },
-      {
          "css": [ "wwstyle.css" ],
          "js": [ "jquery-1.8.3.min.js", "wwscript.js" ],
          "matches": [ "*://*/webwork/*", "*://*/webwork2/*" ]
