@@ -236,6 +236,37 @@ addConfirmationListener();
     });
 })();
 
+(function() {
+    'use strict';
+
+    // Select the container element where you want to add the duplicate submit button
+    var submitButtonsContainer = document.querySelector('.d-flex.submit-buttons-container');
+
+    if (submitButtonsContainer) {
+        // Create a new submit button element
+        var duplicateSubmitButton = document.createElement("input");
+        duplicateSubmitButton.className = "btn btn-primary";
+        duplicateSubmitButton.type = "submit";
+        duplicateSubmitButton.value = "Submit Answers"; // You can change the button text as needed
+
+        // Add event listener to simulate click on the existing submit button
+        duplicateSubmitButton.addEventListener("click", function() {
+            var existingSubmitButton = document.querySelector('[name="submitAnswers"]');
+            if (existingSubmitButton) {
+                existingSubmitButton.click(); // Simulate click on existing submit button
+            } else {
+                console.error("Existing submit button not found!");
+            }
+        });
+
+        // Append the button to the container element
+        submitButtonsContainer.appendChild(duplicateSubmitButton);
+    } else {
+        console.error("Submit buttons container not found!");
+    }
+})();
+
+
 /*
 // Add previous answers button
 (function() {
