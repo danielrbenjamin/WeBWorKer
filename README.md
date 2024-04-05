@@ -9,7 +9,7 @@ A Chrome extension to provide a real-time preview of math entered into WeBWorK t
 
 Available at https://chromewebstore.google.com/detail/webworker/cokogomdladilchdakkknehhnnoipbke
 
-Should work with most implementations of WebWorK, please create an issue on GitHub if you notice any errors.
+Should work with most implementations of WeBWorK, please create an issue on GitHub if you notice any errors.
 
 Based off of [WeBWorKMathView by Noah Tajwar](https://github.com/noaht11/WeBWorKMathView) and [WeBWorK Parentheses Checker by James Yuzawa](yuzawa-san/webwork-parentheses-checker).
 
