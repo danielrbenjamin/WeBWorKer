@@ -6,7 +6,7 @@
 // github.com/yuzawa-san
 
 var checkerActive = false;
-var floater, prefBox;
+var floater;
 
 function spaces(n) {
     var str = "";
@@ -73,7 +73,7 @@ function checkMatchingBrackets(expr) {
             // other characters, escaping html
             if (ch == "<") {
                 sexyText += "&lt;";
-            } else if (ct == ">") {
+            } else if (ch == ">") {
                 sexyText += "&gt;";
             } else {
                 sexyText += ch;
@@ -96,7 +96,7 @@ function showValidFloater(floater, content) {
 
 function showInvalidFloater(floater, content, errorLocation) {
     floater.addClass('ww_invalid_floater');
-    floater.html(content + "<BR>" + spaces(errorLocation) + "<span class=ww_fail>^</span>");
+    floater.html(content + "<br>" + spaces(errorLocation) + "<span class=ww_fail>^</span>");
 }
 
 function updateFloaterPosition(inputElement) {
@@ -114,53 +114,37 @@ function updateFloaterPosition(inputElement) {
 }
 
 $(document).ready(function () {
-    // make floater box
+    // Make floater box
     floater = $('<div/>').attr('id', 'wwchecker-floater');
 
-    // make preferences box
-    prefBox = $('<div/>').attr('id', 'wwchecker-box');
-    activeCheckbox = $('<input/>').attr('id', 'wwchecker-active').attr('type', 'checkbox');
-    prefBox.append(activeCheckbox);
-    prefBox.append(" check for matching parentheses");
 
-    // attach boxes
-    $('body').prepend(prefBox).prepend(floater);
+    // Attach boxes
+    $('body').prepend(floater);
 
-    // first run
-    if (!localStorage.wwactive) {
-        localStorage.wwactive = 'active';
-    }
-    checkerActive = (localStorage.wwactive == 'active');
+    // Load the state from chrome.storage.sync
+    chrome.storage.sync.get({ checkParenthesesEnabled: true }, function(result) {
+        checkerActive = result.checkParenthesesEnabled;
 
-    // bind events to answer boxes
-    $('input[id*=AnSwEr], input[id*=MuLtIaNsWeR]').each(function () {
-        var inputElement = $(this);
+        // Bind events to answer boxes
+        $('input[id*=AnSwEr], input[id*=MuLtIaNsWeR]').each(function () {
+            var inputElement = $(this);
 
-        inputElement.on('input', function () {
-            isValid(inputElement);
-        });
+            inputElement.on('input', function () {
+                isValid(inputElement);
+            });
 
-        inputElement.focus(function () {
-            updateFloaterPosition(inputElement);
-            isValid(inputElement);
-        });
+            inputElement.focus(function () {
+                updateFloaterPosition(inputElement);
+                isValid(inputElement);
+            });
 
-        inputElement.blur(function () {
-            floater.hide();
+            inputElement.blur(function () {
+                floater.hide();
+            });
         });
     });
 
-    // bind preferences
-    $("#wwchecker-active").attr('checked', checkerActive).click(function () {
-        checkerActive = ($(this).attr('checked') == "checked");
-        if (checkerActive) {
-            localStorage.wwactive = 'active';
-        } else {
-            localStorage.wwactive = 'inactive';
-        }
-    });
-
-    // reposition floater on window resize
+    // Reposition floater on window resize
     $(window).resize(function () {
         var focusedInput = $('input:focus');
         if (focusedInput.length > 0) {
@@ -168,7 +152,7 @@ $(document).ready(function () {
         }
     });
 
-    // reposition floater on window scroll
+    // Reposition floater on window scroll
     $(window).scroll(function () {
         var focusedInput = $('input:focus');
         if (focusedInput.length > 0) {
@@ -177,7 +161,7 @@ $(document).ready(function () {
     });
 });
 
-// validate input box on page load
+// Validate input box on page load
 $(window).load(function () {
     var focusedInput = $('input:focus');
     if (focusedInput.length > 0) {

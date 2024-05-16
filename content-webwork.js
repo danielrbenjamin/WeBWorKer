@@ -1,19 +1,18 @@
 console.log("[WeBWorKer] content-webwork.js");
 
-// Prepare function to set up MathView on a webwork page
-var webworkSetup = function () {
+var webworkSetup = async function () {
     var MATH_FONT = {
         "size": "1.21em",
         "family": "KaTeX_Main, Times New Roman, serif"
-    }
+    };
 
     var retrieveTextInputs = function () {
         return document.getElementsByClassName("codeshard");
-    }
+    };
 
     var retrieveSelectInputs = function () {
         return document.getElementsByClassName("pg-select");
-    }
+    };
 
     var applyToInputs = function () {
         console.log("[WeBWorKer] Inserting MathView elements");
@@ -39,9 +38,9 @@ var webworkSetup = function () {
             }
         }
         console.log("[WeBWorKer] Rendered");
-    }
+    };
 
-    var createClearAnswers = function () {
+    var createClearAnswers = async function () {
         console.log("[WeBWorKer] Creating Clear Answers button");
 
         // Check if the button already exists
@@ -49,6 +48,10 @@ var webworkSetup = function () {
             console.log("[WeBWorKer] Clear Answers button already attached");
             return;
         }
+
+        // Check if the feature is enabled
+        var { clearAnswersEnabled } = await chrome.storage.sync.get({ clearAnswersEnabled: true });
+        if (!clearAnswersEnabled) return;
 
         var previewAnswers = document.getElementById("previewAnswers_id");
         if (previewAnswers != null) {
@@ -83,6 +86,20 @@ var webworkSetup = function () {
                 }
             });
 
+            // Insert the button
+            previewAnswers.parentNode.insertBefore(clearAnswers, null);
+        }
+    };
+
+    var createPiazzaButton = async function () {
+        console.log("[WeBWorKer] Creating Piazza button");
+
+        // Check if the feature is enabled
+        var { piazzaEnabled } = await chrome.storage.sync.get({ piazzaEnabled: true });
+        if (!piazzaEnabled) return;
+
+        var previewAnswers = document.getElementById("previewAnswers_id");
+        if (previewAnswers != null) {
             // Create "Piazza Button" button
             var piazzaButton = document.createElement("input");
             piazzaButton.id = "piazzaButton";
@@ -91,8 +108,6 @@ var webworkSetup = function () {
             piazzaButton.value = "Open Piazza";
             piazzaButton.style.backgroundColor = "#4e739d";
             piazzaButton.style.backgroundImage = "none";
-
-            
 
             // Add event listener to copy text from the div with id "problem_body" when clicked
             piazzaButton.addEventListener("click", function () {
@@ -109,13 +124,25 @@ var webworkSetup = function () {
                     document.execCommand("copy");
                     document.body.removeChild(textarea);
 
-
                     // Open Piazza with the copied text
                     window.open("https://piazza.com/", "_blank");
                 }
             });
 
+            // Insert the button
+            previewAnswers.parentNode.insertBefore(piazzaButton, null);
+        }
+    };
 
+    var createResourcesButton = async function () {
+        console.log("[WeBWorKer] Creating Online Resources button");
+
+        // Check if the feature is enabled
+        var { resourcesEnabled } = await chrome.storage.sync.get({ resourcesEnabled: true });
+        if (!resourcesEnabled) return;
+
+        var previewAnswers = document.getElementById("previewAnswers_id");
+        if (previewAnswers != null) {
             // Create "Google Search Button" button
             var googleSearchButton = document.createElement("input");
             googleSearchButton.id = "googleSearchButton";
@@ -124,7 +151,6 @@ var webworkSetup = function () {
             googleSearchButton.value = "Online Resources";
             googleSearchButton.style.backgroundColor = "#731DD8";
             googleSearchButton.style.backgroundImage = "none";
-
 
             // Add event listener to copy text from the div with id "problem_body" when clicked
             googleSearchButton.addEventListener("click", function () {
@@ -145,35 +171,18 @@ var webworkSetup = function () {
                     window.open("https://www.google.com/search?q=" + encodeURIComponent(problemBody.textContent), "_blank");
                 }
             });
-/*
-            // Create "Buy Me a Coffee Button" button
-            var buyMeACoffeeButton = document.createElement("input");
-            buyMeACoffeeButton.id = "buyMeACoffeeButton";
-            buyMeACoffeeButton.className = "btn btn-secondary mb-1"; // Adjust the class as needed
-            buyMeACoffeeButton.type = "button";
-            buyMeACoffeeButton.value = "🍕";
-            buyMeACoffeeButton.style.backgroundColor = "#182d6f";
-            buyMeACoffeeButton.style.backgroundImage = "none";
 
-            // Add event listener to open the Buy Me a Coffee link when clicked
-            buyMeACoffeeButton.addEventListener("click", function () {
-                window.open("https://www.buymeacoffee.com/danielrbenjamin", "_blank");
-            });
-
-*/
-
-            // Insert buttons
-            previewAnswers.parentNode.insertBefore(clearAnswers, null);
-            previewAnswers.parentNode.insertBefore(piazzaButton, null);
-            piazzaButton.parentNode.insertBefore(googleSearchButton, piazzaButton.nextSibling);
-            // googleSearchButton.parentNode.insertBefore(buyMeACoffeeButton, googleSearchButton.nextSibling);
+            // Insert the button
+            previewAnswers.parentNode.insertBefore(googleSearchButton, null);
         }
-    }
+    };
 
-    var main = function () {
+    var main = async function () {
         applyToInputs();
-        createClearAnswers();
-    }
+        await createClearAnswers();
+        await createPiazzaButton();
+        await createResourcesButton();
+    };
 
     var textInputs = retrieveTextInputs();
     var selectInputs = retrieveSelectInputs();
@@ -183,9 +192,8 @@ var webworkSetup = function () {
         document.addEventListener("DOMContentLoaded", function () {
             console.log("[WeBWorKer] DOM available");
             main();
-        })
-    }
-    else {
+        });
+    } else {
         main();
     }
 };
@@ -236,6 +244,20 @@ addConfirmationListener();
     });
 })();
 
+// Function to add the copyright footer
+(function addCopyrightFooter() {
+    var footer = document.getElementById("last-modified");
+    if (footer) {
+        var copyrightDiv = document.createElement("div");
+        copyrightDiv.id = "WeBWorKer-copyright";
+        copyrightDiv.textContent = "WeBWorKer Made By Daniel Benjamin © 2024";
+        
+        // Insert the new div before the last-modified element
+        footer.parentNode.insertBefore(copyrightDiv, footer);
+    };
+})();
+
+
 (function() {
     'use strict';
 
@@ -266,60 +288,39 @@ addConfirmationListener();
     }
 })();
 
-
 /*
-// Add previous answers button
-(function() {
-    'use strict';
+var createSettingsButton = function () {
+    console.log("[WeBWorKer] Creating Settings button");
 
-    // Select all elements with the specified class
-    var targetElements = document.querySelectorAll('.btn.btn-sm.btn-secondary.codeshard-btn');
+    // Check if the button already exists
+    if (document.getElementById("settingsButton")) {
+        console.log("[WeBWorKer] Settings button already attached");
+        return;
+    }
 
-    // Iterate through each element and change its class
-    targetElements.forEach(function(element) {
-        element.className = 'input-group d-inline-flex flex-nowrap w-auto mv-container';
-    });
+    var targetElement = document.querySelector(".btn.btn-light.btn-sm.ms-2");
+    if (targetElement != null) {
+        // Create "Settings" button
+        var settingsButton = document.createElement("input");
+        settingsButton.id = "settingsButton";
+        settingsButton.className = "btn btn-light btn-sm ms-2"; // Adjust the class as needed
+        settingsButton.type = "button";
+        settingsButton.value = "WeBWorKer Settings";
+        settingsButton.style.backgroundColor = "#007bff";
+        settingsButton.style.backgroundImage = "none";
 
-    // Add event listener to create the "Previous Answer" button
-    var createPreviousAnswerButton = function() {
-        console.log("[WeBWorKer] Creating Previous Answer button");
-
-        // Check if the button already exists
-        if (document.getElementById("previousAnswerButton")) {
-            console.log("[WeBWorKer] Previous Answer button already attached");
-            return;
-        }
-
-        // Create "Previous Answer" button
-        var previousAnswerButton = document.createElement("input");
-        previousAnswerButton.id = "previousAnswerButton";
-        previousAnswerButton.className = "btn btn-secondary mb-1";
-        previousAnswerButton.type = "button";
-        previousAnswerButton.value = "Previous Answer";
-
-        // Initialize a variable to track the visibility state
-        var isVisible = false;
-
-        previousAnswerButton.addEventListener("click", function () {
-            var previousAnswers = document.querySelectorAll('[name*="previous_AnSwEr"]');
-            previousAnswers.forEach(function(answer) {
-                // Toggle visibility
-                answer.type = isVisible ? "hidden" : "text";
-                // Change text color to red
-                answer.style.color = isVisible ? "black" : "red";
-            });
-            
-            // Toggle the visibility state
-            isVisible = !isVisible;
+        // Add event listener to open extension options page
+        settingsButton.addEventListener("click", function () {
+            // Manually construct the options page URL and open it
+            var optionsUrl = chrome.runtime.getURL('popup.html');
+            window.open(optionsUrl);
         });
 
-        // Insert the "Previous Answer" button
-        var clearAnswersButton = document.getElementById("clearAnswersButton");
-        if (clearAnswersButton) {
-            clearAnswersButton.parentNode.insertBefore(previousAnswerButton, clearAnswersButton.nextSibling);
-        }
-    };
+        // Insert the button before the target element
+        targetElement.parentNode.insertBefore(settingsButton, targetElement);
+    }
+};
 
-    createPreviousAnswerButton();
-})();
+createSettingsButton();
+
 */

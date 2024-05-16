@@ -23,7 +23,7 @@ body {
 }
 
 .header img {
-    margin-right: 20px;
+    margin-right: 15px;
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -102,4 +102,17 @@ input:checked + .slider:before {
     color: #fff;
     font-size: 1.2em;
     margin-left: 10px; /* Adjusted margin */
+}
+
+.text-link {
+    color: white;
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.text-link:hover {
+    text-decoration: underline;
 }
