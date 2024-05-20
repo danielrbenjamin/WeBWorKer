@@ -33,8 +33,8 @@ var webworkSetup = async function () {
                 theInput.setAttribute("autocapitalize", "off");
                 theInput.setAttribute("spellcheck", "false");
 
-                theInput.style.fontSize = MATH_FONT.size;
-                theInput.style.fontFamily = MATH_FONT.family;
+                //theInput.style.fontSize = MATH_FONT.size;
+                //theInput.style.fontFamily = MATH_FONT.family;
             }
         }
         console.log("[WeBWorKer] Rendered");
@@ -236,13 +236,30 @@ addConfirmationListener();
     'use strict';
 
     // Select all elements with the specified class
+    var targetElements1 = document.querySelectorAll('.codeshard');
+
+    // Iterate through each element and change its class
+    targetElements1.forEach(function(element) {
+        element.className = 'codeshard-btn';
+    });
+})();
+
+
+(function() {
+    'use strict';
+
+    // Select all elements with the specified class
     var targetElements = document.querySelectorAll('.btn.btn-sm.btn-secondary.codeshard-btn');
 
     // Iterate through each element and change its class
     targetElements.forEach(function(element) {
         element.className = 'input-group d-inline-flex flex-nowrap w-auto mv-container';
+        element.style.borderWidth = '0px'; // Set border width to 0px
+        element.style.backgroundColor = 'transparent'; // Set background color to transparent
+        element.style.transform = 'translateX(2px)'; // Move element to the right by 2 pixels
     });
 })();
+
 
 // Function to add the copyright footer
 (function addCopyrightFooter() {
