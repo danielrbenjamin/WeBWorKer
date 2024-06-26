@@ -22,7 +22,7 @@ This extension makes use of the following open source libraries:
 - AsciiMath
 	- This extension uses a modified version of the ASCIIMathTeXImg.js file that returns a LaTeX string for a given AsciiMath input. The set of accepted AsciiMath inputs is heavily modified to reflect the functions actually supported by WeBWorK as listed here: https://webwork.maa.org/wiki/Available_Functions
 
-# Installation
+# Manual Installation
 
 1. Go to the dropdown on the green code button, and download ZIP
 
