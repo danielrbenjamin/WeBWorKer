@@ -184,11 +184,11 @@ var webworkSetup = async function () {
         await createResourcesButton();
     };
 
-    var textInputs = retrieveTextInputs();
-    var selectInputs = retrieveSelectInputs();
+    // Check if the "problem-content" div is available instead of codeshard or pg-select classes
+    var problemContent = document.querySelector(".problem-content");
 
-    if (textInputs.length == 0 && selectInputs.length == 0) {
-        console.log("[WeBWorKer] DOM not available. Waiting to insert MathView elements...");
+    if (!problemContent) {
+        console.log("[WeBWorKer] 'problem-content' not available. Waiting to insert MathView elements...");
         document.addEventListener("DOMContentLoaded", function () {
             console.log("[WeBWorKer] DOM available");
             main();
