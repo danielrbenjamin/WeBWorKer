@@ -177,11 +177,68 @@ var webworkSetup = async function () {
         }
     };
 
+    // Add this function to create the Screenshot button
+    
+    var createScreenshotButton = async function () {
+        console.log("[WeBWorKer] Creating Screenshot button");
+    
+        // Check if the feature is enabled
+        var { screenshotButtonEnabled } = await chrome.storage.sync.get({ screenshotButtonEnabled: true });
+        console.log("Screenshot Button Enabled:", screenshotButtonEnabled);
+        if (!screenshotButtonEnabled) return;
+    
+        var previewAnswers = document.getElementById("previewAnswers_id");
+        if (!previewAnswers) {
+            console.log("[WeBWorKer] 'previewAnswers_id' not found.");
+            return;
+        }
+    
+        // Create the "Screenshot" button
+        var screenshotButton = document.createElement("input");
+        screenshotButton.id = "screenshotButton";
+        screenshotButton.className = "btn btn-secondary mb-1";
+        screenshotButton.type = "button";
+        screenshotButton.value = "Screenshot Question";
+        screenshotButton.style.backgroundColor = "#5a9";
+        screenshotButton.style.backgroundImage = "none";
+    
+        // Add event listener to take a screenshot of the question
+        screenshotButton.addEventListener("click", function () {
+            var questionElement = document.querySelector(".problem-content");
+            var breadcrumbElement = document.getElementById("breadcrumb-row");
+    
+            // Check if the breadcrumb content exists and retrieve the text
+            var fileName = "question-screenshot.png"; // Default filename
+            if (breadcrumbElement && breadcrumbElement.textContent.trim() !== "") {
+                fileName = breadcrumbElement.textContent.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".png";
+            }
+    
+            if (questionElement) {
+                html2canvas(questionElement).then(canvas => {
+                    var link = document.createElement("a");
+                    link.href = canvas.toDataURL("image/png");
+                    link.download = fileName;
+                    link.click();
+                }).catch(error => {
+                    console.error("Screenshot failed:", error);
+                });
+            } else {
+                alert("Question content not found!");
+            }
+        });
+    
+        // Insert the button
+        console.log("[WeBWorKer] Inserting Screenshot button.");
+        previewAnswers.parentNode.insertBefore(screenshotButton, null);
+    };
+       
+
     var main = async function () {
         applyToInputs();
         await createClearAnswers();
         await createPiazzaButton();
         await createResourcesButton();
+        await createScreenshotButton();
     };
 
     // Check if the "problem-content" div is available instead of codeshard or pg-select classes
@@ -281,7 +338,11 @@ addConfirmationListener();
     // Select the container element where you want to add the duplicate submit button
     var submitButtonsContainer = document.querySelector('.d-flex.submit-buttons-container');
 
-    if (submitButtonsContainer) {
+    // Find the existing submit button
+    var existingSubmitButton = document.querySelector('[name="submitAnswers"]');
+
+    // Check if both the container and the existing submit button are found
+    if (submitButtonsContainer && existingSubmitButton) {
         // Create a new submit button element
         var duplicateSubmitButton = document.createElement("input");
         duplicateSubmitButton.className = "btn btn-primary";
@@ -290,20 +351,17 @@ addConfirmationListener();
 
         // Add event listener to simulate click on the existing submit button
         duplicateSubmitButton.addEventListener("click", function() {
-            var existingSubmitButton = document.querySelector('[name="submitAnswers"]');
-            if (existingSubmitButton) {
-                existingSubmitButton.click(); // Simulate click on existing submit button
-            } else {
-                console.error("Existing submit button not found!");
-            }
+            existingSubmitButton.click(); // Simulate click on existing submit button
         });
 
         // Append the button to the container element
         submitButtonsContainer.appendChild(duplicateSubmitButton);
+        console.log("[WeBWorKer] Duplicate submit button added.");
     } else {
-        console.error("Submit buttons container not found!");
+        console.error("Existing submit button not found or submit buttons container not found!");
     }
 })();
+
 
 /*
 var createSettingsButton = function () {

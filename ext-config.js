@@ -12,6 +12,7 @@ var ExtConfig = new function () {
     var JS_DEPENDENCIES = [
         "lib/katex/katex.min.js",
         "lib/asciimath/ASCIIMathTeXImg.js",
+        "lib/html2canvas/html2canvas.min.js",
         "math-view.js",
         "content-webwork.js"
     ];

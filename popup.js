@@ -4,6 +4,7 @@ var buttonClearAnswers = document.getElementById("toggleClearAnswers");
 var buttonPiazza = document.getElementById("togglePiazzaButton");
 var buttonResources = document.getElementById("toggleResourcesButton");
 var buttonCheckParentheses = document.getElementById("toggleCheckParentheses");
+var buttonScreenshot = document.getElementById("toggleScreenshotButton");
 var refreshPageLink = document.getElementById("refreshPage");
 
 var refreshToggles = async () => {
@@ -30,12 +31,14 @@ var refreshToggles = async () => {
             clearAnswersEnabled: true, // Default to true
             piazzaEnabled: true, // Default to true
             resourcesEnabled: true, // Default to true
-            checkParenthesesEnabled: true // Default to true
+            checkParenthesesEnabled: true, // Default to true
+            screenshotButtonEnabled: true
         }, (result) => {
             buttonClearAnswers.checked = result.clearAnswersEnabled;
             buttonPiazza.checked = result.piazzaEnabled;
             buttonResources.checked = result.resourcesEnabled;
             buttonCheckParentheses.checked = result.checkParenthesesEnabled;
+            buttonScreenshot.checked = result.screenshotButtonEnabled;
         });
     } catch (error) {
         console.error('Error refreshing toggles:', error);
@@ -93,6 +96,11 @@ buttonResources.addEventListener("click", async () => {
 buttonCheckParentheses.addEventListener("click", async () => {
     var enabled = buttonCheckParentheses.checked;
     await chrome.storage.sync.set({ 'checkParenthesesEnabled': enabled });
+});
+
+buttonScreenshot.addEventListener("click", async () => {
+    var enabled = buttonScreenshot.checked;
+    await chrome.storage.sync.set({ 'screenshotButtonEnabled': enabled });
 });
 
 // Add event listener for the refresh link
