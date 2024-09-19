@@ -26,8 +26,8 @@ This extension makes use of the following open source libraries:
 # Manual Installation
 
 1. Go to the dropdown on the green code button, and download ZIP
-
-	![Screenshot 2024-01-20 221034](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/9264d633-9c17-466d-a12f-0636d1b745fb)
+   
+	![DownloadZip](https://github.com/user-attachments/assets/5bd07a09-0d03-4bf1-8bca-6340b37f291d)
 
 3. Extract the ZIP file to the desired location on your computer
 4. Go to the Extensions Page in Chrome (`chrome://extensions/`) in the URL bar
