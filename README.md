@@ -9,7 +9,7 @@ Available at https://chromewebstore.google.com/detail/webworker/cokogomdladilchd
 
 Should work with most implementations of WeBWorK, please create an issue on GitHub if you notice any errors.
 
-Based off of [WeBWorKMathView by Noah Tajwar](https://github.com/noaht11/WeBWorKMathView) and [WeBWorK Parentheses Checker by James Yuzawa](yuzawa-san/webwork-parentheses-checker).
+Based off of [WeBWorKMathView by Noah Tajwar](https://github.com/noaht11/WeBWorKMathView) and [WeBWorK Parentheses Checker by James Yuzawa](https://github.com/yuzawa-san/webwork-parentheses-checker).
 
 # Libraries
 
