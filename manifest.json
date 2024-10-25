@@ -2,7 +2,7 @@
    "manifest_version": 3,
 
    "name": "WeBWorKer",
-   "version": "1.6",
+   "version": "1.7",
    "description": "Add additional features to WeBWorK like real-time preview, parentheses checker, limited attempts warning, and more!",
    "author": "Daniel Benjamin",
 
