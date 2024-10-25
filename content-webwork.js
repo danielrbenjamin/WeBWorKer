@@ -19,22 +19,43 @@ var webworkSetup = async function () {
         var inputs = retrieveTextInputs();
         for (var i = 0; i < inputs.length; i++) {
             var theInput = inputs[i];
-
+    
+            // If MathView is not yet applied, create MathView
             if (!MathView.hasMathView(theInput)) {
                 var aMath = theInput.value;
-
+    
                 var mathView = MathView.createMathView(i, theInput);
-
+    
                 theInput.nextSibling.insertAdjacentElement('afterend', mathView);
                 MathView.updateMath(i, aMath);
-
+    
+                // Set input attributes
                 theInput.setAttribute("autocomplete", "off");
                 theInput.setAttribute("autocorrect", "off");
                 theInput.setAttribute("autocapitalize", "off");
                 theInput.setAttribute("spellcheck", "false");
-
-                //theInput.style.fontSize = MATH_FONT.size;
-                //theInput.style.fontFamily = MATH_FONT.family;
+    
+                // Create a resizable container around the input box
+                var wrapperDiv = document.createElement("div");
+                wrapperDiv.className = "resizable-input-container";
+                wrapperDiv.style.position = "relative";
+                wrapperDiv.style.display = "inline-block";
+                wrapperDiv.style.resize = "horizontal";
+                wrapperDiv.style.overflow = "auto";
+                wrapperDiv.style.padding = "2px";
+                wrapperDiv.style.minWidth = "100px";  // Set minimum width
+                wrapperDiv.style.minHeight = "30px"; // Set minimum height
+    
+                // Insert the input into the wrapper
+                theInput.parentNode.insertBefore(wrapperDiv, theInput);
+                wrapperDiv.appendChild(theInput);
+    
+                // Style the input so it fits within the resizable container
+                theInput.style.width = "100%";
+                theInput.style.height = "30px"; // Fixed height to prevent vertical resizing
+                theInput.style.boxSizing = "border-box"; // Ensures padding and borders are included in the width and height
+                theInput.style.lineHeight = "30px"; // Ensure text stays vertically centered
+                theInput.style.whiteSpace = "nowrap"; // Ensure no text wrapping (single-line input behavior)
             }
         }
         console.log("[WeBWorKer] Rendered");
