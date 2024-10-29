@@ -1,3 +1,5 @@
+[link-cws]: https://chromewebstore.google.com/detail/webworker/cokogomdladilchdakkknehhnnoipbke
+
 ![Thumbnail](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/c53907d4-d325-47b3-a90f-0d562bc58ffe)
 ![Frame 1](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/1499cbce-1159-4756-b054-3d3243ef099c)
 
@@ -6,6 +8,8 @@
 A Chrome extension to provide a real-time preview of math entered into WeBWorK text fields, and show whether parentheses are correctly completed, with minimal distraction in the form of extra input boxes or misaligned overlays.
 
 Available at https://chromewebstore.google.com/detail/webworker/cokogomdladilchdakkknehhnnoipbke
+
+<img src="https://raw.githubusercontent.com/alrra/browser-logos/90fdf03c/src/chrome/chrome.svg" width="48" alt="Chrome" valign="middle"> [<img valign="middle" src="https://img.shields.io/chrome-web-store/v/cokogomdladilchdakkknehhnnoipbke.svg">][link-cws] [<img valign="middle" src="https://img.shields.io/chrome-web-store/users/cokogomdladilchdakkknehhnnoipbke.svg">][link-cws]
 
 Should work with most implementations of WeBWorK, please create an issue on GitHub if you notice any errors.
 
