@@ -383,6 +383,105 @@ addConfirmationListener();
     }
 })();
 
+// Function to check if any PDFs are already rendered
+function arePDFsAlreadyRendered() {
+    const renderedPDFs = document.querySelectorAll("iframe[src$='.pdf']");
+    return renderedPDFs.length > 0;
+}
+
+// Function to embed a PDF viewer when a placeholder image with a PDF source is found
+function embedPDFViewerFromImage(imageElement) {
+    const pdfUrl = imageElement.src;
+    console.log("[WeBWorKer] Found PDF link in image src:", pdfUrl);
+
+    // Create a container for the iframe and the open link
+    const container = document.createElement("div");
+    container.style.position = "relative";
+    container.style.width = "100%";
+    container.style.marginBottom = "10px"; // Add space below the container if needed
+
+    // Create an iframe to display the PDF
+    const iframe = document.createElement("iframe");
+    iframe.src = pdfUrl;
+    iframe.style.width = "100%";
+    iframe.style.height = "600px"; // Adjust height as needed
+    iframe.style.border = "none";
+
+    // Create an "Open in New Tab" button below the iframe
+    const openButton = document.createElement("a");
+    openButton.href = pdfUrl;
+    openButton.target = "_blank"; // Opens in a new tab
+    openButton.textContent = "Open PDF in New Tab";
+    openButton.style.display = "inline-block";
+    openButton.style.marginTop = "8px";
+    openButton.style.padding = "6px 12px";
+    openButton.style.backgroundColor = "#007bff";
+    openButton.style.color = "#fff";
+    openButton.style.textDecoration = "none";
+    openButton.style.borderRadius = "4px";
+    openButton.style.fontSize = "14px";
+    openButton.style.textAlign = "center";
+
+    // Append the iframe and the button to the container
+    container.appendChild(iframe);
+    container.appendChild(openButton);
+
+    // Replace the placeholder image with the container (iframe + button)
+    imageElement.parentNode.replaceChild(container, imageElement);
+    console.log("[WeBWorKer] PDF iframe with 'Open in New Tab' button embedded for:", pdfUrl);
+}
+
+// Function to detect and replace PDF placeholders
+function detectAndRenderPDFPlaceholders() {
+    console.log("[WeBWorKer] Detecting placeholder images with PDF links in src...");
+    const placeholderImages = document.querySelectorAll("img.image-view-elt");
+
+    placeholderImages.forEach(imageElement => {
+        console.log("[WeBWorKer] Checking image src:", imageElement.src);
+
+        if (imageElement.src.endsWith(".pdf") && imageElement.src.includes("/webwork2_files/tmp/")) {
+            console.log("[WeBWorKer] Placeholder with PDF link detected in src:", imageElement.src);
+            embedPDFViewerFromImage(imageElement);
+        } else {
+            console.log("[WeBWorKer] No matching PDF link for this image src.");
+        }
+    });
+}
+
+// Check if any PDFs are already rendered before proceeding
+if (!arePDFsAlreadyRendered()) {
+    console.log("[WeBWorKer] No rendered PDFs found. Proceeding with placeholder replacement.");
+
+    // Initialize a MutationObserver to watch for new image placeholders
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1 && node.tagName === "IMG" && node.classList.contains("image-view-elt")) {
+                    console.log("[WeBWorKer] New placeholder image detected:", node);
+
+                    if (node.src.endsWith(".pdf") && node.src.includes("/webwork2_files/tmp/")) {
+                        console.log("[WeBWorKer] New placeholder with PDF link detected in src:", node.src);
+                        embedPDFViewerFromImage(node);
+                    } else {
+                        console.log("[WeBWorKer] New placeholder image does not match PDF link pattern.");
+                    }
+                }
+            });
+        });
+    });
+
+    // Observe the document body for changes (new image placeholders)
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+    console.log("[WeBWorKer] MutationObserver initialized to watch for PDF placeholders.");
+
+    // Initial call to render any PDFs that are already in the DOM
+    detectAndRenderPDFPlaceholders();
+} else {
+    console.log("[WeBWorKer] Rendered PDFs already found on the page. Skipping placeholder replacement.");
+}
 
 /*
 var createSettingsButton = function () {
