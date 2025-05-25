@@ -1,20 +1,16 @@
 {
    "manifest_version": 3,
-
    "name": "WeBWorKer",
    "version": "1.8",
    "description": "Add additional features to WeBWorK like real-time preview, parentheses checker, limited attempts warning, and more!",
    "author": "Daniel Benjamin",
-
    "minimum_chrome_version": "96",
-
    "icons": {
       "16": "icon/icon_16.png",
       "32": "icon/icon_32.png",
       "48": "icon/icon_48.png",
       "128": "icon/icon_128.png"
    },
-
    "action": {
       "default_title": "WeBWorKer",
       "default_popup": "popup.html",
@@ -25,35 +21,47 @@
          "128": "icon/icon_128.png"
       }
    },
-
    "background": {
       "service_worker": "worker.js"
    },
-
    "web_accessible_resources": [
       {
-         "resources": ["lib/katex/fonts/*"],
-         "resources": [ "/popup.html" ],
-         "matches": ["<all_urls>"]
+         "resources": [
+            "lib/katex/fonts/*"
+         ],
+         "matches": [
+            "<all_urls>"
+         ]
       }
    ],
-
    "permissions": [
       "activeTab",
       "declarativeContent",
       "scripting",
       "storage"
    ],
-
    "host_permissions": [
       "*://*/*"
    ],
-
    "content_scripts": [
       {
-         "css": [ "wwstyle.css" ],
-         "js": [ "lib/jquery/jquery-1.8.3.min.js", "wwscript.js" ],
-         "matches": [ "*://*/webwork/*", "*://*/webwork2/*" ]
+         "matches": [
+            "*://*/webwork/*",
+            "*://*/webwork2/*"
+         ],
+         "css": [
+            "wwstyle.css",
+            "lib/katex/katex.css"
+         ],
+         "js": [
+            "lib/jquery/jquery-1.8.3.min.js",
+            "lib/asciimath/ASCIIMathTeXImg.js",
+            "lib/katex/katex.min.js",
+            "lib/html2canvas/html2canvas.min.js",
+            "math-view.js",
+            "wwscript.js",
+            "content-webwork.js"
+         ]
       }
    ]
 }

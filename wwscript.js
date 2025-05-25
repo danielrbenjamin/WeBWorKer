@@ -1,171 +1,79 @@
-// Adapted by Daniel Benjamin
-// from
-// wwchecker
-// james yuzawa
-// jyuzawa.com
-// github.com/yuzawa-san
+// wwscript.js
+/**
+ * @fileoverview Main script for WeBWorKer parenthesis checker feature.
+ * This script initializes the parenthesis checker and its associated UI floater.
+ * It retrieves user settings for enabling the feature and then delegates
+ * the UI management and checking logic to imported modules.
+ * Adapted by Daniel Benjamin from wwchecker by james yuzawa.
+ */
 
-var checkerActive = false;
-var floater;
+import { checkMatchingBrackets } from './lib/modules/parenthesisChecker.js';
+import { initParenthesisFloater } from './lib/modules/parenthesisFloater.js';
 
-function spaces(n) {
-    var str = "";
-    for (var i = 0; i < n; i++) {
-        str += "&nbsp;";
-    }
-    return str;
+console.log("[WeBWorKer] wwscript.js - Parenthesis Checker initializing...");
+
+/**
+ * Tracks whether the parenthesis checking feature is active.
+ * This is determined by user settings retrieved from chrome.storage.sync.
+ * @type {boolean}
+ */
+let checkerFeatureActive = false; // Default value, will be updated from storage
+
+/**
+ * Returns the current state of the `checkerFeatureActive` flag.
+ * This function is passed to the parenthesisFloater module to allow it
+ * to dynamically check if the feature is enabled.
+ * @returns {boolean} True if the checker is active, false otherwise.
+ */
+function isCheckerFeatureActive() {
+    return checkerFeatureActive;
 }
 
-function isValid($obj) {
-    var expr = $obj.val();
-    var floater = $("#wwchecker-floater");
-
-    if (checkerActive && (expr !== '' || $obj.is(':focus'))) {
-        if (expr.match(/[\(\[\{\)\]\}]/)) {
-            floater.show();
-            // Validation logic for matching parentheses
-            var validationOutput = checkMatchingBrackets(expr);
-            if (validationOutput[0]) {
-                showValidFloater(floater, validationOutput[2]);
-            } else {
-                showInvalidFloater(floater, validationOutput[2], validationOutput[1]);
-            }
-        } else {
-            floater.hide();
-        }
-    } else {
-        floater.hide();
-    }
-}
-
-function checkMatchingBrackets(expr) {
-    var tokenStack = [];
-    var sexyText = "";
-    var ct = 0;
-    var lastUnclosedIndex = -1;
-
-    for (var i = 0; i < expr.length; i++) {
-        var ch = expr.charAt(i);
-
-        if (ch == "(" || ch == "[" || ch == "{") {
-            // opening grouping
-            tokenStack.push(ch);
-            sexyText += "<span class=ww_pair" + (ct % 5) + ">" + ch + "</span>";
-            ct++;
-        } else if (ch == ")" || ch == "]" || ch == "}") {
-            // closing grouping
-            var head = tokenStack[tokenStack.length - 1];
-            if (!head) {
-                // stack is empty
-                return [false, i, sexyText + "<span class=ww_pairbad>" + expr.substring(i) + "</span>"];
-            }
-            if ((head == "(" && ch == ")") || (head == "[" && ch == "]") || (head == "{" && ch == "}")) {
-                // match found
-                tokenStack.pop();
-                ct--;
-                sexyText += "<span class=ww_pair" + (ct % 5) + ">" + ch + "</span>";
-            } else {
-                // grouping mismatch
-                lastUnclosedIndex = i;
-                return [false, lastUnclosedIndex, sexyText];
-            }
-        } else {
-            // other characters, escaping html
-            if (ch == "<") {
-                sexyText += "&lt;";
-            } else if (ch == ">") {
-                sexyText += "&gt;";
-            } else {
-                sexyText += ch;
-            }
-        }
-    }
-
-    if (tokenStack.length > 0) {
-        // Unclosed brackets at the end
-        lastUnclosedIndex = expr.length - 1;
-    }
-
-    return [tokenStack.length === 0, lastUnclosedIndex, sexyText];
-}
-
-function showValidFloater(floater, content) {
-    floater.removeClass('ww_invalid_floater');
-    floater.html(content);
-}
-
-function showInvalidFloater(floater, content, errorLocation) {
-    floater.addClass('ww_invalid_floater');
-    floater.html(content + "<br>" + spaces(errorLocation) + "<span class=ww_fail>^</span>");
-}
-
-function updateFloaterPosition(inputElement) {
-    var floater = $("#wwchecker-floater");
-
-    if (inputElement) {
-        var offsetStruct = inputElement.offset();
-        var itemHeight = inputElement.outerHeight();
-
-        floater.css({
-            left: offsetStruct.left,
-            top: offsetStruct.top + itemHeight + 10
-        });
-    }
-}
-
-$(document).ready(function () {
-    // Make floater box
-    floater = $('<div/>').attr('id', 'wwchecker-floater');
-
-
-    // Attach boxes
-    $('body').prepend(floater);
-
-    // Load the state from chrome.storage.sync
+// Initialize checker state from storage and then initialize the floater UI.
+// The `checkParenthesesEnabled` key in storage determines if the feature is on.
+// This needs to happen after the DOM is ready for UI manipulations.
+$(document).ready(function() {
     chrome.storage.sync.get({ checkParenthesesEnabled: true }, function(result) {
-        checkerActive = result.checkParenthesesEnabled;
+        checkerFeatureActive = result.checkParenthesesEnabled;
+        console.log(`[WeBWorKer] Parenthesis checker feature is ${checkerFeatureActive ? 'enabled' : 'disabled'} based on user settings.`);
 
-        // Bind events to answer boxes
-        $('input[id*=AnSwEr], input[id*=MuLtIaNsWeR]').each(function () {
-            var inputElement = $(this);
-
-            inputElement.on('input', function () {
-                isValid(inputElement);
-            });
-
-            inputElement.focus(function () {
-                updateFloaterPosition(inputElement);
-                isValid(inputElement);
-            });
-
-            inputElement.blur(function () {
-                floater.hide();
-            });
-        });
-    });
-
-    // Reposition floater on window resize
-    $(window).resize(function () {
-        var focusedInput = $('input:focus');
-        if (focusedInput.length > 0) {
-            updateFloaterPosition(focusedInput);
-        }
-    });
-
-    // Reposition floater on window scroll
-    $(window).scroll(function () {
-        var focusedInput = $('input:focus');
-        if (focusedInput.length > 0) {
-            updateFloaterPosition(focusedInput);
-        }
+        // Initialize the floater UI.
+        // initParenthesisFloater handles creating the floater element,
+        // binding events to relevant input fields, and window resize/scroll.
+        // It will internally use isCheckerFeatureActive to decide whether to show/hide itself.
+        initParenthesisFloater(isCheckerFeatureActive, checkMatchingBrackets);
+        
+        // If the feature is initially disabled, we might not even call init,
+        // or initParenthesisFloater itself checks this and does minimal setup.
+        // The current structure of initParenthesisFloater suggests it should be called regardless,
+        // and it will respect the checkerFeatureActive status.
     });
 });
 
-// Validate input box on page load
-$(window).load(function () {
-    var focusedInput = $('input:focus');
-    if (focusedInput.length > 0) {
-        isValid(focusedInput);
-        updateFloaterPosition(focusedInput);
+
+// Listener for messages from other parts of the extension (e.g., popup)
+// This allows the checkerFeatureActive state to be updated dynamically if the user
+// changes settings while the page is open.
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (request.action === 'toggleParenthesisChecker') { // Ensure this action matches popup.js
+        checkerFeatureActive = request.enabled;
+        console.log(`[WeBWorKer] Parenthesis checker status updated via message to: ${checkerFeatureActive ? 'enabled' : 'disabled'}`);
+        
+        // If the floater UI was already initialized, it will start/stop showing
+        // based on the new state of isCheckerFeatureActive().
+        // If it wasn't (e.g., if init was conditional), this would be the place to call initParenthesisFloater.
+        // Assuming initParenthesisFloater has been called by $(document).ready(),
+        // we don't need to call it again. The floater's internal logic should handle visibility.
+        // The floater's event handlers for 'input', 'focus' use the passed isCheckerFeatureActive function.
+
+        // It might be useful to explicitly tell the floater to update its state if it's already initialized.
+        // For example, if the user disables the feature while a floater is visible.
+        // This depends on how initParenthesisFloater handles such dynamic changes.
+        // For now, we assume the continuous check via isCheckerFeatureActive in its event handlers is sufficient.
+
+        sendResponse({ success: true, checkerEnabled: checkerFeatureActive });
     }
+    return true; // Required for asynchronous sendResponse
 });
+
+console.log("[WeBWorKer] wwscript.js - Parenthesis Checker initialization sequence complete.");
