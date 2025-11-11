@@ -7,65 +7,38 @@
 <body>
     <div id="popup-container">
         <div class="header">
-            <img src="icon/icon_128.png" alt="Extension Icon"/>
-            <h1>WeBWorKer</h1>
-            <h2>by Daniel Benjamin</h2>
+            <img src="icon/icon128.png" alt="Extension Icon"/>
+            <div class="header-text">
+                <h1>WeBWorKer</h1>
+                <h2>by Daniel Benjamin</h2>
+            </div>
         </div>
-        <div class="content">
-            <label class="switch">
-                <input id="enableThisSite" type="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <span class="toggle-label">Enable Extension On This Site</span>
+        <div class="settings-section">
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Enable On This Site</span>
+                </div>
+                <label class="switch">
+                    <input id="enableThisSite" type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <div class="setting-info">
+                    <span class="setting-label">Enable Globally</span>
+                </div>
+                <label class="switch">
+                    <input id="enableGlobal" type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+            </div>
         </div>
-        <div class="content">
-            <label class="switch">
-                <input id="enableGlobal" type="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <span class="toggle-label">Enable Extension Globally</span>
-        </div>
-        <!-- Add new toggle switches here -->
-        <div class="content">
-            <label class="switch">
-                <input id="toggleClearAnswers" type="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <span class="toggle-label">Toggle Clear Answers Button</span>
-        </div>
-        <div class="content">
-            <label class="switch">
-                <input id="togglePiazzaButton" type="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <span class="toggle-label">Toggle Open Piazza Button</span>
-        </div>
-        <div class="content">
-            <label class="switch">
-                <input id="toggleResourcesButton" type="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <span class="toggle-label">Toggle Online Resources Button</span>
-        </div>
-        <div class="content">
-            <label class="switch">
-                <input id="toggleCheckParentheses" type="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <span class="toggle-label">Check for Parentheses</span>
-        </div>
-        <div class="content">
-            <label class="switch">
-                <input id="toggleScreenshotButton" type="checkbox">
-                <span class="slider round"></span>
-            </label>
-            <span class="toggle-label">Toggle Screenshot Button</span>
-        </div>
-        <div class="info">
-            <a id="refreshPage" href="#" class="text-link">Please Refresh to See Changes</a>
-        </div>
-        <div class="info">
-            <a href="https://www.buymeacoffee.com/danielrbenjamin" target="_blank" class="text-link">Please Donate if you Find this Useful :)</a>
+        <!-- Feature toggles are rendered dynamically by popup.js using ExtConfig.toggleDefinitions -->
+        <div id="featureToggles"></div>
+        <div class="footer-links">
+            <a id="refreshPage" href="#" class="footer-link">Refresh to See Changes</a>
+            <a id="openOnboarding" href="#" class="footer-link">Help & Getting Started</a>
+            <a href="https://www.buymeacoffee.com/danielrbenjamin" target="_blank" class="footer-link donate-link">Support This Extension</a>
         </div>
     </div>
     <script src="popup.js"></script>

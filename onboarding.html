@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to WeBWorKer</title>
+    <link rel="stylesheet" href="onboarding.css">
+    <script src="ext-config.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="hero">
+            <img src="icon/icon128.png" alt="WeBWorKer Icon" class="hero-icon">
+            <h1>Welcome to WeBWorKer!</h1>
+            <p class="version">Version <span id="version">2.0</span></p>
+            <p class="author">Created by <strong>Daniel Benjamin</strong></p>
+            <p class="subtitle">Your ultimate companion for WebWork problems</p>
+        </header>
+
+        <section class="update-notice" id="updateNotice" style="display: none;">
+            <h2>🎉 What's New</h2>
+            <ul id="updateList"></ul>
+        </section>
+
+        <section class="getting-started">
+            <h2>Getting Started</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Enable on Your WebWork Site</h3>
+                        <p>Click the extension icon in your browser toolbar when you're on a WebWork page, then toggle "Enable On This Site" or "Enable Globally".</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Refresh the Page</h3>
+                        <p>After enabling the extension, refresh your WebWork page to see all the features in action.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Customize Your Experience</h3>
+                        <p>Open the extension popup to configure features and customize settings to your preference.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📐</div>
+                    <h3>Live Math Preview</h3>
+                    <p>See your mathematical expressions rendered in real-time as you type using KaTeX.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Desmos Integration</h3>
+                    <p>Access a Desmos scientific calculator sidebar to visualize and solve problems.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔢</div>
+                    <h3>Variable Management</h3>
+                    <p>Parse and use variables from problem text. Define custom variables and use Ctrl+Enter to substitute them.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📸</div>
+                    <h3>Smart Screenshots</h3>
+                    <p>Capture clean screenshots of problems without headers. Choose to copy to clipboard or download.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Quick Resources</h3>
+                    <p>Search for help online, access Piazza, or use custom query buttons to find solutions faster.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✓</div>
+                    <h3>Parentheses Checker</h3>
+                    <p>Visual validation of matching brackets, parentheses, and braces in your answers.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🗑️</div>
+                    <h3>Clear Answers</h3>
+                    <p>Quickly clear all answer boxes with one click (with confirmation for safety).</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📏</div>
+                    <h3>Resizable Inputs</h3>
+                    <p>Resize answer input boxes to see longer expressions more clearly.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="tips">
+            <h2>Pro Tips</h2>
+            <div class="tips-list">
+                <div class="tip">
+                    <strong>Variable Substitution:</strong> Type variables like "k*x*2" in answer boxes and press <kbd>Ctrl+Enter</kbd> to automatically substitute values from the problem.
+                </div>
+                <div class="tip">
+                    <strong>Custom Variables:</strong> Define your own variables using the panel above problem statements for quick calculations.
+                </div>
+                <div class="tip">
+                    <strong>Screenshot Mode:</strong> Set your preferred screenshot mode (copy or download) in the extension settings popup.
+                </div>
+                <div class="tip">
+                    <strong>Custom Queries:</strong> Configure your preferred AI assistant or search engine in the extension popup for quick problem lookups.
+                </div>
+            </div>
+        </section>
+
+        <section class="settings-preview">
+            <h2>Quick Settings</h2>
+            <p>Customize your WeBWorKer experience:</p>
+            <div id="settingsToggles" class="settings-toggles">
+                <!-- Toggles will be dynamically inserted here -->
+            </div>
+        </section>
+
+        <section class="support">
+            <h2>Support & Feedback</h2>
+            <p>Enjoying WeBWorKer? Consider supporting the development:</p>
+            <div class="support-buttons">
+                <a href="https://www.buymeacoffee.com/danielrbenjamin" target="_blank" class="support-button donate">
+                    ☕ Buy Me a Coffee
+                </a>
+                <a href="https://github.com/danielrbenjamin/WeBWorKeR-beta" target="_blank" class="support-button github">
+                    ⭐ Star on GitHub
+                </a>
+            </div>
+            <p class="feedback-text">Found a bug or have a feature request? <a href="https://github.com/danielrbenjamin/WeBWorKeR-beta/issues" target="_blank">Report it on GitHub</a></p>
+        </section>
+
+        <footer>
+            <p class="footer-author">Made with ❤️ by <strong>Daniel Benjamin</strong></p>
+            <p class="footer-copyright">© 2025 Daniel Benjamin. All rights reserved.</p>
+            <p class="footer-links">
+                <a href="#" id="dontShowAgain">Don't show this on updates</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="onboarding.js"></script>
+</body>
+</html>

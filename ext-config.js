@@ -6,15 +6,16 @@ var ExtConfig = new function () {
 
     var CSS_DEPENDENCIES = [
         "lib/katex/katex.css",
-        "math-view.css"
+        "math-view.css",
+        "desmos-sidebar.css"
     ];
 
     var JS_DEPENDENCIES = [
         "lib/katex/katex.min.js",
         "lib/asciimath/ASCIIMathTeXImg.js",
-        "lib/html2canvas/html2canvas.min.js",
         "math-view.js",
-        "content-webwork.js"
+        "content-webwork.js",
+        "desmos-sidebar.js"
     ];
 
     /**
@@ -189,4 +190,16 @@ var ExtConfig = new function () {
             "target": target
         })
     }
+
+    // Toggle definitions used by popup to dynamically render feature toggles.
+    // Each entry: { id: DOM id for checkbox, storageKey: key in chrome.storage.sync, label: user-visible label, default: boolean }
+    this.toggleDefinitions = [
+        { id: "toggleClearAnswers", storageKey: "clearAnswersEnabled", label: "Toggle Clear Answers Button", default: true },
+        { id: "togglePiazzaButton", storageKey: "piazzaEnabled", label: "Toggle Open Piazza Button", default: true },
+        { id: "toggleResourcesButton", storageKey: "resourcesEnabled", label: "Toggle Online Resources Button", default: true },
+        { id: "toggleCheckParentheses", storageKey: "checkParenthesesEnabled", label: "Check for Parentheses", default: true },
+        { id: "toggleScreenshotButton", storageKey: "screenshotButtonEnabled", label: "Toggle Screenshot Button", default: true, hasOptions: true },
+        { id: "toggleCustomQueryButton", storageKey: "customQueryEnabled", label: "Toggle Custom Query Button", default: true },
+        { id: "toggleDesmosSidebar", storageKey: "desmosSidebarEnabled", label: "Show Desmos Scientific Sidebar", default: false }
+    ];
 };

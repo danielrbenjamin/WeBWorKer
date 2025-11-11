@@ -1,28 +1,28 @@
 {
    "manifest_version": 3,
 
-   "name": "WeBWorKer",
-   "version": "1.8",
+   "name": "WeBWorKer ADVANCED",
+   "version": "2.0",
    "description": "Add additional features to WeBWorK like real-time preview, parentheses checker, limited attempts warning, and more!",
    "author": "Daniel Benjamin",
 
    "minimum_chrome_version": "96",
 
    "icons": {
-      "16": "icon/icon_16.png",
-      "32": "icon/icon_32.png",
-      "48": "icon/icon_48.png",
-      "128": "icon/icon_128.png"
+      "16": "icon/icon16.png",
+      "32": "icon/icon32.png",
+      "48": "icon/icon48.png",
+      "128": "icon/icon128.png"
    },
 
    "action": {
       "default_title": "WeBWorKer",
       "default_popup": "popup.html",
       "default_icon": {
-         "16": "icon/icon_16.png",
-         "32": "icon/icon_32.png",
-         "48": "icon/icon_48.png",
-         "128": "icon/icon_128.png"
+         "16": "icon/icon16.png",
+         "32": "icon/icon32.png",
+         "48": "icon/icon48.png",
+         "128": "icon/icon128.png"
       }
    },
 
@@ -32,8 +32,10 @@
 
    "web_accessible_resources": [
       {
-         "resources": ["lib/katex/fonts/*"],
-         "resources": [ "/popup.html" ],
+         "resources": [
+            "lib/katex/fonts/*",
+            "/popup.html"
+         ],
          "matches": ["<all_urls>"]
       }
    ],
@@ -42,18 +44,15 @@
       "activeTab",
       "declarativeContent",
       "scripting",
-      "storage"
+      "storage",
+      "tabs"
    ],
 
    "host_permissions": [
       "*://*/*"
    ],
 
-   "content_scripts": [
-      {
-         "css": [ "wwstyle.css" ],
-         "js": [ "lib/jquery/jquery-1.8.3.min.js", "wwscript.js" ],
-         "matches": [ "*://*/webwork/*", "*://*/webwork2/*" ]
-      }
+   "optional_host_permissions": [
+      "<all_urls>"
    ]
 }

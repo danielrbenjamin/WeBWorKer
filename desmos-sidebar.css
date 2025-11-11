@@ -1,0 +1,104 @@
+/* Desmos sidebar styles for WeBWorKeR-beta */
+.webworker-desmos-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 360px;
+  height: 100vh;
+  background: #ffffff;
+  border-left: 1px solid rgba(0,0,0,0.1);
+  box-shadow: -4px 0 12px rgba(0,0,0,0.15);
+  z-index: 2147483647; /* very high */
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.22s ease;
+}
+
+.webworker-desmos-sidebar.collapsed {
+  transform: translateX(100%);
+}
+
+.webworker-desmos-sidebar .dw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  color: #ffffff;
+}
+
+.webworker-desmos-sidebar .dw-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.webworker-desmos-sidebar .dw-close-btn {
+  cursor: pointer;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 24px;
+  line-height: 1;
+  padding: 4px 10px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-weight: 300;
+}
+
+.webworker-desmos-sidebar .dw-close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.webworker-desmos-sidebar .dw-close-btn:active {
+  transform: scale(0.95);
+}
+
+.webworker-desmos-sidebar iframe.dw-iframe {
+  width: 100%;
+  height: calc(100vh - 48px);
+  border: 0;
+}
+
+/* small-screen adjustments */
+@media (max-width: 700px) {
+  .webworker-desmos-sidebar { width: 100%; }
+}
+
+/* Floating handle to control the sidebar from the page */
+.webworker-desmos-handle {
+  position: fixed;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 2147483647;
+  cursor: pointer;
+  font-size: 22px;
+  transition: all 0.3s ease;
+}
+
+.webworker-desmos-handle:hover {
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+
+.webworker-desmos-handle:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* Hidden state for the sidebar element (keeps it in DOM but not visible) */
+.webworker-desmos-sidebar.hidden {
+  display: none;
+}
