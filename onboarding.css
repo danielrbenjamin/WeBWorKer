@@ -44,13 +44,13 @@ body {
 }
 
 .version {
-    font-size: 0.9em;
+    font-size: 1.2em;
     opacity: 0.9;
     margin-bottom: 5px;
 }
 
 .author {
-    font-size: 1.1em;
+    font-size: 1.5em;
     opacity: 0.95;
     margin-bottom: 10px;
 }
