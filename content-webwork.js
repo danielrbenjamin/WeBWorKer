@@ -1206,30 +1206,35 @@ var webworkSetup = async function () {
 
     // Intercept submit button clicks to apply variable substitution before submitting
     var interceptSubmitButton = function() {
-        console.log('[WeBWorKer] Setting up submit button interception');
-        
+        console.log('[WeBWorKer] Setting up submit/check button interception');
+
         // Find all forms on the page
         var forms = document.querySelectorAll('form');
         forms.forEach(function(form) {
-            // Look for submit button in this form
-            var submitButton = form.querySelector('[name="submitAnswers"]');
-            if (submitButton) {
+            // Look for submit and check buttons in this form
+            var buttons = form.querySelectorAll('[name="submitAnswers"], [name="checkAnswers"]');
+            buttons.forEach(function(btn) {
+                if (!btn) return;
                 // Store original click handler flag
-                if (!submitButton.hasAttribute('data-weworker-intercepted')) {
-                    submitButton.setAttribute('data-weworker-intercepted', 'true');
-                    
+                if (!btn.hasAttribute('data-weworker-intercepted')) {
+                    btn.setAttribute('data-weworker-intercepted', 'true');
+
                     // Add click event listener with capture phase to intercept before other handlers
-                    submitButton.addEventListener('click', function(event) {
-                        console.log('[WeBWorKer] Submit button clicked, applying variables to all inputs');
-                        // Apply variable substitution to all inputs
-                        applyVariablesToAllInputs();
-                        // Let the original submit process continue
+                    btn.addEventListener('click', function(event) {
+                        try {
+                            console.log('[WeBWorKer] Submit/Check button clicked (name=' + (btn.name || btn.getAttribute('name')) + '), applying variables to all inputs');
+                            // Apply variable substitution to all inputs
+                            applyVariablesToAllInputs();
+                        } catch (e) {
+                            console.error('[WeBWorKer] Error while applying variables on click', e);
+                        }
+                        // Let the original submit/check process continue
                     }, true); // Use capture phase
                 }
-            }
+            });
         });
-        
-        console.log('[WeBWorKer] Submit button interception setup complete');
+
+        console.log('[WeBWorKer] Submit/Check button interception setup complete');
     };
 
     // Enhance Homework Sets table by fetching Grades page and inserting Problems and Score columns
