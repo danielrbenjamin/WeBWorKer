@@ -13,8 +13,6 @@ Available at https://chromewebstore.google.com/detail/webworker/cokogomdladilchd
 
 Should work with most implementations of WeBWorK, please create an issue on GitHub if you notice any errors.
 
-Based off of [WeBWorKMathView by Noah Tajwar](https://github.com/noaht11/WeBWorKMathView) and [WeBWorK Parentheses Checker by James Yuzawa](https://github.com/yuzawa-san/webwork-parentheses-checker).
-
 # Libraries
 
 This extension makes use of the following open source libraries:
@@ -25,7 +23,6 @@ This extension makes use of the following open source libraries:
 	- The WeBWorK platform already uses MathJax to render its own equations, so this extension uses WeBWorK's instance of MathJax
 - AsciiMath
 	- This extension uses a modified version of the ASCIIMathTeXImg.js file that returns a LaTeX string for a given AsciiMath input. The set of accepted AsciiMath inputs is heavily modified to reflect the functions actually supported by WeBWorK as listed here: https://webwork.maa.org/wiki/Available_Functions
- - html2canvas
 
 # Manual Installation
 
@@ -41,3 +38,9 @@ This extension makes use of the following open source libraries:
 
 7. Select the inner `WeBWorKer-main` folder
 8. Done!
+
+# Acknowledgements
+Built on the shoulders of giants:
+- [WeBWorKMathView by Noah Tajwar](https://github.com/noaht11/WeBWorKMathView)
+- [WeBWorK Parentheses Checker by James Yuzawa](https://github.com/yuzawa-san/webwork-parentheses-checker)
+- [WeBWorK AlphaLinK by Munro Anderson](https://github.com/munr0/WeBWorK-AlphaLinK)
