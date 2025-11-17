@@ -198,6 +198,7 @@ var ExtConfig = new function () {
         { id: "togglePiazzaButton", storageKey: "piazzaEnabled", label: "Toggle Open Piazza Button", default: true },
         { id: "toggleResourcesButton", storageKey: "resourcesEnabled", label: "Toggle Online Resources Button", default: true },
         { id: "toggleCheckParentheses", storageKey: "checkParenthesesEnabled", label: "Check for Parentheses", default: true },
+        { id: "toggleVariableSubstitution", storageKey: "variableSubstitutionEnabled", label: "Enable Variable Substitution", default: true },
         { id: "toggleScreenshotButton", storageKey: "screenshotButtonEnabled", label: "Toggle Screenshot Button", default: true, hasOptions: true },
         { id: "toggleCustomQueryButton", storageKey: "customQueryEnabled", label: "Toggle Custom Query Button", default: true },
         { id: "toggleDesmosSidebar", storageKey: "desmosSidebarEnabled", label: "Show Desmos Scientific Sidebar", default: false }

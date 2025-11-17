@@ -273,6 +273,12 @@ function showUpdateNotice(oldVersion, newVersion) {
 // Get update notes for specific versions
 function getUpdatesForVersion(version) {
     const updateNotes = {
+        '2.1': [
+            'Added toggle to enable/disable variable substitution feature',
+            'Variable substitution can now be turned off in extension settings',
+            'Fixed placeholder text to only show variable instructions when feature is enabled',
+            'Improved form submission handling for variable substitution'
+        ],
         '2.0': [
             'Added comprehensive onboarding page with instructions',
             'Screenshot mode settings (copy to clipboard or download)',

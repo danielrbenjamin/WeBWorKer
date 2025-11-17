@@ -396,13 +396,24 @@ var webworkSetup = async function () {
                 theInput.style.lineHeight = "30px"; // Ensure text stays vertically centered
                 theInput.style.whiteSpace = "nowrap"; // Ensure no text wrapping (single-line input behavior)
                 
-                // Update placeholder to indicate variable feature
-                theInput.setAttribute("placeholder", "Enter answer or use variables (e.g., k*x*2) - Press Ctrl+Enter to apply");
-                
                 // --- Combined variable processing with keyboard shortcut ---
                 try {
-                    // Use IIFE to capture the current input in closure
-                    (function(currentInput) {
+                    // Check if variable substitution is enabled before attaching handlers
+                    chrome.storage.sync.get({ variableSubstitutionEnabled: true }, function(storageResult) {
+                        var variableSubstitutionEnabled = !!storageResult.variableSubstitutionEnabled;
+                        
+                        // Update placeholder to indicate variable feature only if enabled
+                        if (variableSubstitutionEnabled) {
+                            theInput.setAttribute("placeholder", "Enter answer or use variables (e.g., k*x*2) - Press Ctrl+Enter to apply");
+                        }
+                        
+                        // If variable substitution is disabled, do not attach substitution handlers
+                        if (!variableSubstitutionEnabled) {
+                            return;
+                        }
+
+                        // Use IIFE to capture the current input in closure
+                        (function(currentInput) {
                         // Function to evaluate expression by substituting parsed variables
                         var applyVariableSubstitution = function () {
                             var expr = currentInput.value || '';
@@ -509,30 +520,36 @@ var webworkSetup = async function () {
                         }
                     };
 
-                    // Store this function for later use on submit
-                    inputSubstitutionFunctions.push(applyVariableSubstitution);
+                        // Store this function for later use on submit
+                        inputSubstitutionFunctions.push(applyVariableSubstitution);
 
-                    // Allow Ctrl+Enter in main input to trigger variable substitution
-                    currentInput.addEventListener('keydown', function (evt) {
-                        if (evt.ctrlKey && evt.key === 'Enter') {
-                            evt.preventDefault();
-                            applyVariableSubstitution();
-                        }
-                    });
-                    })(theInput); // Close IIFE and pass theInput
+                        // Allow Ctrl+Enter in main input to trigger variable substitution
+                        currentInput.addEventListener('keydown', function (evt) {
+                            if (evt.ctrlKey && evt.key === 'Enter') {
+                                evt.preventDefault();
+                                applyVariableSubstitution();
+                            }
+                        });
+                        })(theInput); // Close IIFE and pass theInput
+                    }); // end storage.get
                 } catch (e) {
                     console.error('[WeBWorKer] Failed to attach variable processing', e);
                 }
             }
         }
         console.log("[WeBWorKer] Rendered");
-        // After rendering inputs, show variable panel
-        try {
-            var vars = getAllVariables();  // Use getAllVariables instead of parseVariables
-            renderVariablePanel(vars);
-        } catch (e) {
-            console.error('[WeBWorKer] error rendering variables panel', e);
-        }
+        
+        // After rendering inputs, show variable panel (only if enabled)
+        chrome.storage.sync.get({ variableSubstitutionEnabled: true }, function(storageResult) {
+            if (storageResult.variableSubstitutionEnabled) {
+                try {
+                    var vars = getAllVariables();  // Use getAllVariables instead of parseVariables
+                    renderVariablePanel(vars);
+                } catch (e) {
+                    console.error('[WeBWorKer] error rendering variables panel', e);
+                }
+            }
+        });
     };
 
     var createClearAnswers = async function () {
@@ -1208,33 +1225,38 @@ var webworkSetup = async function () {
     var interceptSubmitButton = function() {
         console.log('[WeBWorKer] Setting up submit/check button interception');
 
-        // Find all forms on the page
-        var forms = document.querySelectorAll('form');
-        forms.forEach(function(form) {
-            // Look for submit and check buttons in this form
-            var buttons = form.querySelectorAll('[name="submitAnswers"], [name="checkAnswers"]');
-            buttons.forEach(function(btn) {
-                if (!btn) return;
-                // Store original click handler flag
-                if (!btn.hasAttribute('data-weworker-intercepted')) {
-                    btn.setAttribute('data-weworker-intercepted', 'true');
+        // Check if variable substitution is enabled
+        chrome.storage.sync.get({ variableSubstitutionEnabled: true }, function(storageResult) {
+            var variableSubstitutionEnabled = !!storageResult.variableSubstitutionEnabled;
 
-                    // Add click event listener with capture phase to intercept before other handlers
-                    btn.addEventListener('click', function(event) {
-                        try {
-                            console.log('[WeBWorKer] Submit/Check button clicked (name=' + (btn.name || btn.getAttribute('name')) + '), applying variables to all inputs');
-                            // Apply variable substitution to all inputs
-                            applyVariablesToAllInputs();
-                        } catch (e) {
-                            console.error('[WeBWorKer] Error while applying variables on click', e);
-                        }
-                        // Let the original submit/check process continue
-                    }, true); // Use capture phase
-                }
+            // Find all forms on the page
+            var forms = document.querySelectorAll('form');
+            forms.forEach(function(form) {
+                // Look for submit and check buttons in this form
+                var buttons = form.querySelectorAll('[name="submitAnswers"], [name="checkAnswers"]');
+                buttons.forEach(function(btn) {
+                    if (!btn) return;
+                    // Store original click handler flag
+                    if (!btn.hasAttribute('data-weworker-intercepted')) {
+                        btn.setAttribute('data-weworker-intercepted', 'true');
+
+                        // Intercept form submission to apply variables synchronously
+                        form.addEventListener('submit', function(event) {
+                            if (variableSubstitutionEnabled) {
+                                try {
+                                    console.log('[WeBWorKer] Form submitting, applying variables to all inputs');
+                                    applyVariablesToAllInputs();
+                                } catch (e) {
+                                    console.error('[WeBWorKer] Error while applying variables on submit', e);
+                                }
+                            }
+                        }, true); // Use capture phase to run before form submission
+                    }
+                });
             });
-        });
 
-        console.log('[WeBWorKer] Submit/Check button interception setup complete');
+            console.log('[WeBWorKer] Submit/Check button interception setup complete');
+        });
     };
 
     // Enhance Homework Sets table by fetching Grades page and inserting Problems and Score columns
