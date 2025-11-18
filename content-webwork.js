@@ -12,6 +12,8 @@ var webworkSetup = async function () {
 
     // Storage for custom user-defined variables
     var customVariables = {};
+    // Storage for parsed variables the user has chosen to disable
+    var disabledParsedVariables = [];
 
     // Generate a unique key for the current problem/page
     var getStorageKey = function(suffix) {
@@ -47,6 +49,20 @@ var webworkSetup = async function () {
         }
     };
 
+    // Load disabled parsed variables from storage
+    var loadDisabledParsedVariables = function() {
+        try {
+            var key = getStorageKey('disabledVars');
+            var stored = localStorage.getItem(key);
+            if (stored) {
+                disabledParsedVariables = JSON.parse(stored) || [];
+                console.log('[WeBWorKer] Loaded disabled parsed variables:', disabledParsedVariables);
+            }
+        } catch (e) {
+            console.error('[WeBWorKer] Error loading disabled parsed variables', e);
+        }
+    };
+
     // Save custom variables to storage
     var saveCustomVariables = function() {
         try {
@@ -55,6 +71,17 @@ var webworkSetup = async function () {
             console.log('[WeBWorKer] Saved custom variables:', customVariables);
         } catch (e) {
             console.error('[WeBWorKer] Error saving custom variables', e);
+        }
+    };
+
+    // Save disabled parsed variables to storage
+    var saveDisabledParsedVariables = function() {
+        try {
+            var key = getStorageKey('disabledVars');
+            localStorage.setItem(key, JSON.stringify(disabledParsedVariables));
+            console.log('[WeBWorKer] Saved disabled parsed variables:', disabledParsedVariables);
+        } catch (e) {
+            console.error('[WeBWorKer] Error saving disabled parsed variables', e);
         }
     };
 
@@ -90,6 +117,14 @@ var webworkSetup = async function () {
     // Get all variables (both parsed and custom)
     var getAllVariables = function () {
         var parsed = parseVariables();
+        // Remove disabled parsed variables
+        try {
+            if (Array.isArray(disabledParsedVariables) && disabledParsedVariables.length > 0) {
+                disabledParsedVariables.forEach(function(name){ delete parsed[name]; });
+            }
+        } catch (e) {
+            console.error('[WeBWorKer] Error filtering disabled parsed variables', e);
+        }
         // Merge custom variables (custom variables override parsed ones)
         return Object.assign({}, parsed, customVariables);
     };
@@ -171,6 +206,39 @@ var webworkSetup = async function () {
                         renderVariablePanel(getAllVariables());
                     });
                     row.appendChild(deleteBtn);
+                } else {
+                    // If this variable was parsed from the problem text, allow the user to disable it
+                    try {
+                        if (parsedVars && parsedVars.hasOwnProperty(k)) {
+                            var disableBtn = document.createElement('button');
+                            disableBtn.type = 'button';
+                            disableBtn.textContent = 'Disable';
+                            disableBtn.style.marginLeft = '4px';
+                            disableBtn.style.border = '1px solid rgba(0,0,0,0.06)';
+                            disableBtn.style.background = '#f3f4f6';
+                            disableBtn.style.color = '#333';
+                            disableBtn.style.padding = '2px 6px';
+                            disableBtn.style.borderRadius = '3px';
+                            disableBtn.style.cursor = 'pointer';
+                            disableBtn.style.fontSize = '12px';
+                            disableBtn.title = 'Disable this detected variable';
+                            disableBtn.addEventListener('click', function(e){
+                                e.stopPropagation();
+                                try {
+                                    if (disabledParsedVariables.indexOf(k) === -1) {
+                                        disabledParsedVariables.push(k);
+                                        saveDisabledParsedVariables();
+                                    }
+                                } catch (err) {
+                                    console.error('[WeBWorKer] Error disabling parsed variable', err);
+                                }
+                                renderVariablePanel(getAllVariables());
+                            });
+                            row.appendChild(disableBtn);
+                        }
+                    } catch (err) {
+                        // ignore panel errors
+                    }
                 }
                 
                 list.appendChild(row);
@@ -213,6 +281,101 @@ var webworkSetup = async function () {
                 panel.appendChild(none);
             } else {
                 panel.appendChild(list);
+            }
+
+            // Add disabled variables section if there are any
+            if (Array.isArray(disabledParsedVariables) && disabledParsedVariables.length > 0) {
+                var disabledSection = document.createElement('div');
+                disabledSection.style.marginTop = '10px';
+                disabledSection.style.paddingTop = '10px';
+                disabledSection.style.borderTop = '1px solid rgba(0,0,0,0.08)';
+
+                var disabledHeader = document.createElement('div');
+                disabledHeader.style.display = 'flex';
+                disabledHeader.style.alignItems = 'center';
+                disabledHeader.style.justifyContent = 'space-between';
+                disabledHeader.style.cursor = 'pointer';
+                disabledHeader.style.marginBottom = '6px';
+
+                var disabledTitle = document.createElement('div');
+                disabledTitle.textContent = 'Disabled variables (' + disabledParsedVariables.length + ')';
+                disabledTitle.style.fontWeight = '600';
+                disabledTitle.style.fontSize = '12px';
+                disabledTitle.style.color = '#666';
+
+                var toggleBtn = document.createElement('span');
+                toggleBtn.textContent = '▼';
+                toggleBtn.style.fontSize = '10px';
+                toggleBtn.style.color = '#666';
+                toggleBtn.style.transition = 'transform 0.2s';
+
+                disabledHeader.appendChild(disabledTitle);
+                disabledHeader.appendChild(toggleBtn);
+
+                var disabledList = document.createElement('div');
+                disabledList.style.display = 'none';
+                disabledList.style.marginTop = '6px';
+
+                disabledParsedVariables.forEach(function(disabledName) {
+                    var disabledRow = document.createElement('div');
+                    disabledRow.style.display = 'inline-block';
+                    disabledRow.style.marginRight = '8px';
+                    disabledRow.style.marginBottom = '6px';
+
+                    var disabledVarName = document.createElement('span');
+                    disabledVarName.textContent = disabledName;
+                    disabledVarName.style.padding = '4px 6px';
+                    disabledVarName.style.background = '#f9fafb';
+                    disabledVarName.style.border = '1px solid rgba(0,0,0,0.08)';
+                    disabledVarName.style.borderRadius = '4px';
+                    disabledVarName.style.fontSize = '13px';
+                    disabledVarName.style.color = '#999';
+
+                    var enableBtn = document.createElement('button');
+                    enableBtn.type = 'button';
+                    enableBtn.textContent = 'Enable';
+                    enableBtn.style.marginLeft = '4px';
+                    enableBtn.style.border = '1px solid rgba(0,0,0,0.08)';
+                    enableBtn.style.background = '#10b981';
+                    enableBtn.style.color = '#fff';
+                    enableBtn.style.padding = '2px 6px';
+                    enableBtn.style.borderRadius = '3px';
+                    enableBtn.style.cursor = 'pointer';
+                    enableBtn.style.fontSize = '12px';
+                    enableBtn.title = 'Enable this variable';
+                    enableBtn.addEventListener('click', function(e){
+                        e.stopPropagation();
+                        try {
+                            var idx = disabledParsedVariables.indexOf(disabledName);
+                            if (idx !== -1) {
+                                disabledParsedVariables.splice(idx, 1);
+                                saveDisabledParsedVariables();
+                            }
+                        } catch (err) {
+                            console.error('[WeBWorKer] Error enabling variable', err);
+                        }
+                        renderVariablePanel(getAllVariables());
+                    });
+
+                    disabledRow.appendChild(disabledVarName);
+                    disabledRow.appendChild(enableBtn);
+                    disabledList.appendChild(disabledRow);
+                });
+
+                // Toggle collapse/expand
+                disabledHeader.addEventListener('click', function() {
+                    if (disabledList.style.display === 'none') {
+                        disabledList.style.display = 'block';
+                        toggleBtn.style.transform = 'rotate(180deg)';
+                    } else {
+                        disabledList.style.display = 'none';
+                        toggleBtn.style.transform = 'rotate(0deg)';
+                    }
+                });
+
+                disabledSection.appendChild(disabledHeader);
+                disabledSection.appendChild(disabledList);
+                panel.appendChild(disabledSection);
             }
 
             // Add custom variable input section
@@ -349,8 +512,9 @@ var webworkSetup = async function () {
     var applyToInputs = function () {
         console.log("[WeBWorKer] Inserting MathView elements");
         
-        // Load custom variables at the start
-        loadCustomVariables();
+            // Load custom variables and disabled parsed list at the start
+            loadCustomVariables();
+            loadDisabledParsedVariables();
         
         // Clear the array for fresh page load
         inputSubstitutionFunctions = [];

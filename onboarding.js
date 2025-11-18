@@ -273,6 +273,10 @@ function showUpdateNotice(oldVersion, newVersion) {
 // Get update notes for specific versions
 function getUpdatesForVersion(version) {
     const updateNotes = {
+        '2.1.1': [
+            'Users can now disable automatically detected variables',
+            'Added collapsible "Disabled variables" section to re-enable disabled variables'
+        ],
         '2.1': [
             'Added toggle to enable/disable variable substitution feature',
             'Variable substitution can now be turned off in extension settings',
