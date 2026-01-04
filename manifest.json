@@ -2,7 +2,7 @@
    "manifest_version": 3,
 
    "name": "WeBWorKer",
-   "version": "2.1.1",
+   "version": "2.2.0",
    "description": "Add additional features to WeBWorK like real-time preview, parentheses checker, limited attempts warning, and more!",
    "author": "Daniel Benjamin",
 
@@ -26,6 +26,10 @@
       }
    },
 
+   "side_panel": {
+      "default_path": "panel.html"
+   },
+
    "background": {
       "service_worker": "worker.js"
    },
@@ -43,7 +47,9 @@
    "permissions": [
       "activeTab",
       "declarativeContent",
+      "declarativeNetRequest",
       "scripting",
+      "sidePanel",
       "storage",
       "tabs"
    ],

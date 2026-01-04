@@ -1,0 +1,31 @@
+/* Floating button to open side panel */
+.webworker-panel-button {
+    position: fixed;
+    right: 20px;
+    bottom: 80px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    line-height: 1;
+}
+
+.webworker-panel-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+}
+
+.webworker-panel-button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}

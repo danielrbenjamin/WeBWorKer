@@ -7,7 +7,7 @@ var ExtConfig = new function () {
     var CSS_DEPENDENCIES = [
         "lib/katex/katex.css",
         "math-view.css",
-        "desmos-sidebar.css"
+        "side-panel-button.css"
     ];
 
     var JS_DEPENDENCIES = [
@@ -15,7 +15,7 @@ var ExtConfig = new function () {
         "lib/asciimath/ASCIIMathTeXImg.js",
         "math-view.js",
         "content-webwork.js",
-        "desmos-sidebar.js"
+        "side-panel-button.js"
     ];
 
     /**
@@ -201,6 +201,6 @@ var ExtConfig = new function () {
         { id: "toggleVariableSubstitution", storageKey: "variableSubstitutionEnabled", label: "Enable Variable Substitution", default: true },
         { id: "toggleScreenshotButton", storageKey: "screenshotButtonEnabled", label: "Toggle Screenshot Button", default: true, hasOptions: true },
         { id: "toggleCustomQueryButton", storageKey: "customQueryEnabled", label: "Toggle Custom Query Button", default: true },
-        { id: "toggleDesmosSidebar", storageKey: "desmosSidebarEnabled", label: "Show Desmos Scientific Sidebar", default: false }
+        { id: "toggleSidePanelButton", storageKey: "sidePanelButtonEnabled", label: "Show Calculator Floating Button", default: true }
     ];
 };

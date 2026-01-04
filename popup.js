@@ -351,6 +351,29 @@ document.getElementById("openOnboarding").addEventListener("click", (event) => {
     chrome.tabs.create({ url: 'onboarding.html' });
 });
 
+// Add event listener for the side panel button
+document.getElementById("openSidePanel").addEventListener("click", async (event) => {
+    event.preventDefault();
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        
+        // Send message to background script to open side panel
+        chrome.runtime.sendMessage({
+            type: 'weworker.openSidePanel',
+            tabId: tab.id
+        }, (response) => {
+            if (response && !response.ok) {
+                console.error('Failed to open side panel:', response.error);
+            }
+        });
+        
+        // Close the popup
+        window.close();
+    } catch (error) {
+        console.error('Error opening side panel:', error);
+    }
+});
+
 // Initialize UI
 buildFeatureToggles();
 refreshToggles();

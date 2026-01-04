@@ -28,6 +28,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return;
     }
 
+    // Handle side panel open request
+    if (message.type === 'weworker.openSidePanel') {
+        // Get tab ID from sender if not provided
+        const tabId = message.tabId || (sender && sender.tab && sender.tab.id);
+        
+        if (tabId) {
+            chrome.sidePanel.open({ tabId: tabId })
+                .then(() => {
+                    sendResponse({ ok: true });
+                })
+                .catch((error) => {
+                    sendResponse({ ok: false, error: error.message });
+                });
+        } else {
+            sendResponse({ ok: false, error: 'No tab ID available' });
+        }
+        return true;
+    }
+
     if (message.type === 'weworker.ensureCapturePermission') {
         const origins = ['<all_urls>'];
         chrome.permissions.contains({ origins }, (has) => {

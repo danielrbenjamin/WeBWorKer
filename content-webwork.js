@@ -1595,7 +1595,7 @@ addConfirmationListener();
     if (footer) {
         var copyrightDiv = document.createElement("div");
         copyrightDiv.id = "WeBWorKer-copyright";
-        copyrightDiv.textContent = "WeBWorKer Made By Daniel Benjamin © 2025";
+        copyrightDiv.textContent = "WeBWorKer Made By Daniel Benjamin © 2026";
         
         // Insert the new div before the last-modified element
         footer.parentNode.insertBefore(copyrightDiv, footer);

@@ -273,6 +273,13 @@ function showUpdateNotice(oldVersion, newVersion) {
 // Get update notes for specific versions
 function getUpdatesForVersion(version) {
     const updateNotes = {
+        '2.2.0': [
+            'Replaced custom Desmos sidebar with Chrome native side panel',
+            'Added floating button on WeBWorK pages to open calculator panel',
+            'Side panel now includes both Desmos Scientific and Graphing calculators',
+            'Improved performance and integration with browser features',
+            'Removed old sidebar toggle from settings'
+        ],
         '2.1.1': [
             'Users can now disable automatically detected variables',
             'Added collapsible "Disabled variables" section to re-enable disabled variables'
