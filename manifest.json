@@ -47,7 +47,6 @@
    "permissions": [
       "activeTab",
       "declarativeContent",
-      "declarativeNetRequest",
       "scripting",
       "sidePanel",
       "storage",

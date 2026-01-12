@@ -4,31 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const toolSelector = document.getElementById('toolSelector');
     const toolIframe = document.getElementById('toolIframe');
 
-    // Configure declarativeNetRequest to allow embedding external sites
+    // Load saved tool or default to Desmos Scientific
     (async () => {
-        await chrome.declarativeNetRequest.updateSessionRules({
-            removeRuleIds: [1],
-            addRules: [{
-                id: 1,
-                priority: 1,
-                action: {
-                    type: 'modifyHeaders',
-                    responseHeaders: [{
-                        header: 'x-frame-options',
-                        operation: 'remove'
-                    }, {
-                        header: 'content-security-policy',
-                        operation: 'remove'
-                    }]
-                },
-                condition: {
-                    regexFilter: 'https://(www.desmos.com)/',
-                    resourceTypes: ['main_frame', 'sub_frame']
-                }
-            }]
-        });
-
-        // Load saved tool or default to Desmos Scientific
         const data = await chrome.storage.sync.get({ selectedTool: 'https://www.desmos.com/scientific' });
         let selectedUrl = data.selectedTool;
         
