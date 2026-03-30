@@ -445,13 +445,20 @@ var webworkSetup = async function () {
                     return;
                 }
                 
-                var value = Number(valueStr);
-                if (isNaN(value)) {
-                    alert('Value must be a valid number');
-                    return;
+                var valueNum = Number(valueStr);
+                if (isNaN(valueNum)) {
+                    // Allow expression strings, but check for valid characters
+                    if (!/^[0-9A-Za-z+\-*/^()., _%eE]+$/.test(valueStr)) {
+                        alert('Value contains invalid characters.');
+                        return;
+                    }
+                    // Minimal normalization of implicit multiplication before saving
+                    valueStr = valueStr.replace(/(\d(?:\.\d+)?)(?=\s*[A-Za-z]\w*)/g, '$1*');
+                    valueStr = valueStr.replace(/(\d(?:\.\d+)?)(?=\s*\()/g, '$1*');
+                    customVariables[name] = valueStr;
+                } else {
+                    customVariables[name] = valueNum;
                 }
-                
-                customVariables[name] = value;
                 saveCustomVariables();  // Save after adding
                 nameInput.value = '';
                 valueInput.value = '';
@@ -600,8 +607,7 @@ var webworkSetup = async function () {
                             ];
                             var fnSet = new Set(allowedFunctions);
 
-                            // Pre-process expression to insert explicit multiplication where users type concatenated variables
-                            // Support multi-letter variables by greedily segmenting letter runs into known variable names.
+                            // Pre-process expression to insert explicit multiplication and normalize function notation
                             try {
                                 var names = Object.keys(vars).sort(function(a,b){return b.length - a.length;});
 
@@ -626,43 +632,56 @@ var webworkSetup = async function () {
                                         // cannot segment this run using known vars -> leave original run
                                         return match;
                                     }
+                                    }
+                                    return parts.join('*');
+                                });
+
+                                // insert explicit multiplication where missing (e.g., 2A, 2(, )2, )(, A()
+                                expr = expr.replace(/(\d(?:\.\d+)?)(?=\s*[A-Za-z]\w*)/g, '$1*');
+                                expr = expr.replace(/(\d(?:\.\d+)?)(?=\s*\()/g, '$1*');
+                                expr = expr.replace(/(\))(?=\s*\d)/g, '$1*');
+                                expr = expr.replace(/(\))(?=\s*\()/g, '$1*');
+                                expr = expr.replace(/([A-Za-z]\w*)(\s*\()/g, function(_, name, paren){
+                                    return fnSet.has(name.toLowerCase()) ? (name + paren) : (name + '*' + paren);
+                                });
+
+                                // Support function application without parentheses, e.g., sin6 -> sin(6), ln x -> ln(x)
+                                var fnAlt = Array.from(fnSet).sort(function(a,b){return b.length - a.length;}).join('|');
+                                // Function followed by a number literal (no parens already)
+                                expr = expr.replace(new RegExp('\\b(' + fnAlt + ')(?!\\s*\\()\\s*([+-]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][+-]?\\d+)?)\\b','gi'), function(_m, fn, num){
+                                    return fn + '(' + num + ')';
+                                });
+                                // Function followed by an identifier (variable) without parens: sinx -> sin(x), also allow space: sin x
+                                expr = expr.replace(new RegExp('\\b(' + fnAlt + ')(?!\\s*\\()\\s*([A-Za-z]\\w*)\\b','gi'), function(_m, fn, id){
+                                    // Don't wrap if the id itself is a known function (rare but safe check)
+                                    if (fnSet.has(id.toLowerCase())) return _m;
+                                    return fn + '(' + id + ')';
+                                });
+                            } catch (e) {
+                                console.error('[WeBWorKer] error normalizing multiplication in expression', e);
+                            }
+
+                            // Substitute var names with parenthesized numeric or expression value in multiple passes to handle nesting
+                            // CONSTRAINT: can only handle 10 layers of nested variables
+                            try {
+                                var names = Object.keys(vars).sort(function(a,b){return b.length - a.length;});
+                                for (var iters = 0; iters < 10; iters++) {
+                                    var changed = false;
+                                    for (var vi = 0; vi < names.length; vi++) {
+                                        var nm = names[vi];
+                                        var esc = nm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                        var reVar = new RegExp('\\b' + esc + '\\b', 'g');
+                                        var nextExpr = expr.replace(reVar, '(' + String(vars[nm]) + ')');
+                                        if (nextExpr !== expr) {
+                                            expr = nextExpr;
+                                            changed = true;
+                                        }
+                                    }
+                                    if (!changed) break;
                                 }
-                                return parts.join('*');
-                            });
-
-                            // insert * between number and identifier: 2A -> 2*A
-                            expr = expr.replace(/(\d(?:\.\d+)?)(?=\s*[A-Za-z]\w*)/g, '$1*');
-                            // insert * between identifier and open paren: A( -> A*(, but NOT for known functions like sin(
-                            expr = expr.replace(/([A-Za-z]\w*)(\s*\()/g, function(_, name, paren){
-                                return fnSet.has(name.toLowerCase()) ? (name + paren) : (name + '*' + paren);
-                            });
-
-                            // Support function application without parentheses, e.g., sin6 -> sin(6), ln x -> ln(x)
-                            var fnAlt = Array.from(fnSet).sort(function(a,b){return b.length - a.length;}).join('|');
-                            // Function followed by a number literal (no parens already)
-                            expr = expr.replace(new RegExp('\\b(' + fnAlt + ')(?!\\s*\\()\\s*([+-]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][+-]?\\d+)?)\\b','gi'), function(_m, fn, num){
-                                return fn + '(' + num + ')';
-                            });
-                            // Function followed by an identifier (variable) without parens: sinx -> sin(x), also allow space: sin x
-                            expr = expr.replace(new RegExp('\\b(' + fnAlt + ')(?!\\s*\\()\\s*([A-Za-z]\\w*)\\b','gi'), function(_m, fn, id){
-                                // Don't wrap if the id itself is a known function (rare but safe check)
-                                if (fnSet.has(id.toLowerCase())) return _m;
-                                return fn + '(' + id + ')';
-                            });
-                        } catch (e) {
-                            console.error('[WeBWorKer] error normalizing multiplication in expression', e);
-                        }
-
-                        // Sort var names by length desc to avoid partial replacements
-                        var names = Object.keys(vars).sort(function(a,b){return b.length - a.length;});
-                        for (var vi = 0; vi < names.length; vi++) {
-                            var nm = names[vi];
-                            // Replace identifiers with parenthesized numeric value
-                            // Use word boundaries to avoid replacing inside other names
-                            var esc = nm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                            var reVar = new RegExp('\\b' + esc + '\\b', 'g');
-                            expr = expr.replace(reVar, '(' + String(vars[nm]) + ')');
-                        }
+                            } catch (e) {
+                                console.error('[WeBWorKer] error substituting variables', e);
+                            }
 
                         // Allow unknown identifiers to pass through; we only sanitize characters below
 
