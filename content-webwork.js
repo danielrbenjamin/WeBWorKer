@@ -1596,25 +1596,26 @@ addConfirmationListener();
     // Find the existing submit button
     var existingSubmitButton = document.querySelector('[name="submitAnswers"]');
 
-    // Check if both the container and the existing submit button are found
-    if (submitButtonsContainer && existingSubmitButton) {
-        // Create a new submit button element
-        var duplicateSubmitButton = document.createElement("input");
-        duplicateSubmitButton.className = "btn btn-primary";
-        duplicateSubmitButton.type = "submit";
-        duplicateSubmitButton.value = "Submit Answers"; // You can change the button text as needed
+    // This extra button is only used by themes with a separate button area.
+    // Other themes and non-problem pages do not need it.
+    if (!submitButtonsContainer || !existingSubmitButton ||
+        document.getElementById('weworker-extra-submit')) return;
 
-        // Add event listener to simulate click on the existing submit button
-        duplicateSubmitButton.addEventListener("click", function() {
-            existingSubmitButton.click(); // Simulate click on existing submit button
-        });
+    // Create a new submit button element
+    var duplicateSubmitButton = document.createElement("input");
+    duplicateSubmitButton.id = 'weworker-extra-submit';
+    duplicateSubmitButton.className = "btn btn-primary";
+    duplicateSubmitButton.type = "button";
+    duplicateSubmitButton.value = "Submit Answers"; // You can change the button text as needed
 
-        // Append the button to the container element
-        submitButtonsContainer.appendChild(duplicateSubmitButton);
-        console.log("[WeBWorKer] Duplicate submit button added.");
-    } else {
-        console.error("Existing submit button not found or submit buttons container not found!");
-    }
+    // Add event listener to simulate click on the existing submit button
+    duplicateSubmitButton.addEventListener("click", function() {
+        existingSubmitButton.click(); // Simulate click on existing submit button
+    });
+
+    // Append the button to the container element
+    submitButtonsContainer.appendChild(duplicateSubmitButton);
+    console.log("[WeBWorKer] Duplicate submit button added.");
 })();
 
 // Function to check if any PDFs are already rendered
