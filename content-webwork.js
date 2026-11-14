@@ -855,93 +855,6 @@ var webworkSetup = async function () {
 
     // Add this function to create the Screenshot button
 
-    var cropScreenshot = (function () {
-        var canvas = null;
-        var template = null;
-
-        return function (image, area, dpr, preserve, format) {
-            return new Promise(function (resolve, reject) {
-                var top = Math.round(area.y * dpr);
-                var left = Math.round(area.x * dpr);
-                var width = Math.max(1, Math.round(area.w * dpr));
-                var height = Math.max(1, Math.round(area.h * dpr));
-                var targetWidth = (dpr !== 1 && preserve) ? width : area.w;
-                var targetHeight = (dpr !== 1 && preserve) ? height : area.h;
-
-                if (!canvas) {
-                    template = document.createElement('template');
-                    canvas = document.createElement('canvas');
-                    document.body.appendChild(template);
-                    template.appendChild(canvas);
-                }
-
-                var destWidth = Math.max(1, Math.round(targetWidth));
-                var destHeight = Math.max(1, Math.round(targetHeight));
-                canvas.width = destWidth;
-                canvas.height = destHeight;
-
-                var finalize = function () {
-                    try {
-                        resolve(canvas.toDataURL(`image/${format}`));
-                    } catch (err) {
-                        reject(err);
-                    }
-                };
-
-                var handleImageError = function () {
-                    reject(new Error('Failed to load captured image'));
-                };
-
-                if (Array.isArray(image)) {
-                    (function loop(index) {
-                        if (index === image.length) {
-                            finalize();
-                            return;
-                        }
-                        var segment = image[index];
-                        var img = new Image();
-                        img.onload = function () {
-                            var context = canvas.getContext('2d');
-                            context.drawImage(
-                                img,
-                                left,
-                                top,
-                                width,
-                                height,
-                                0,
-                                segment.offset || 0,
-                                destWidth,
-                                destHeight
-                            );
-                            loop(index + 1);
-                        };
-                        img.onerror = handleImageError;
-                        img.src = segment.image;
-                    })(0);
-                } else {
-                    var single = new Image();
-                    single.onload = function () {
-                        var context = canvas.getContext('2d');
-                        context.drawImage(
-                            single,
-                            left,
-                            top,
-                            width,
-                            height,
-                            0,
-                            0,
-                            destWidth,
-                            destHeight
-                        );
-                        finalize();
-                    };
-                    single.onerror = handleImageError;
-                    single.src = image;
-                }
-            });
-        };
-    })();
-
     var clampCaptureArea = function (rect) {
         var viewportWidth = window.innerWidth;
         var viewportHeight = window.innerHeight;
@@ -1002,17 +915,153 @@ var webworkSetup = async function () {
         });
     };
 
+    var waitForCaptureLayout = async function (element) {
+        var previous = '';
+        var stableFrames = 0;
+        for (var frame = 0; frame < 120; frame++) {
+            await new Promise(function (resolve) { requestAnimationFrame(resolve); });
+            var rect = element.getBoundingClientRect();
+            var current = [rect.left, rect.top, rect.width, rect.height].join(',');
+            stableFrames = current === previous ? stableFrames + 1 : 0;
+            if (stableFrames >= 3) return;
+            previous = current;
+        }
+        throw new Error('The question is still moving. Please try again.');
+    };
+
+    var loadCaptureImage = function (dataUrl) {
+        return new Promise(function (resolve, reject) {
+            var image = new Image();
+            image.onload = function () { resolve(image); };
+            image.onerror = function () { reject(new Error('Failed to load captured image')); };
+            image.src = dataUrl;
+        });
+    };
+
     var captureElementScreenshot = async function (element, format) {
         format = format || 'png';
-        var rect = element.getBoundingClientRect();
-        var area = clampCaptureArea(rect);
-        if (area.w === 0 || area.h === 0) {
-            throw new Error('Target is outside the viewport');
+        var scrollX = window.scrollX;
+        var scrollY = window.scrollY;
+        var ancestors = [];
+        var savedStyles = [];
+        var saveStyle = function (node, property, value) {
+            savedStyles.push([node, property, node.style.getPropertyValue(property),
+                node.style.getPropertyPriority(property)]);
+            node.style.setProperty(property, value, 'important');
+        };
+        for (var node = element.parentElement; node; node = node.parentElement) {
+            ancestors.push({ node: node, left: node.scrollLeft, top: node.scrollTop });
         }
-
-        var dataUrl = await requestVisibleTabCapture(format);
-        var dpr = window.devicePixelRatio || 1;
-        return await cropScreenshot(dataUrl, area, dpr, true, format);
+        try {
+            // `auto` inherits WeBWorK's CSS smooth scrolling. Disable it explicitly
+            // through capture AND restoration, including nested scroll containers.
+            ancestors.forEach(function (item) {
+                saveStyle(item.node, 'scroll-behavior', 'auto');
+                saveStyle(item.node, 'scroll-snap-type', 'none');
+            });
+            document.querySelectorAll('.masthead, .sticky-nav, #wwh-panel, .webworker-panel-button').forEach(function (overlay) {
+                if (!overlay.contains(element)) saveStyle(overlay, 'visibility', 'hidden');
+            });
+            if (document.fonts) await document.fonts.ready;
+            element.scrollIntoView({ behavior: 'instant', block: 'start', inline: 'start' });
+            await waitForCaptureLayout(element);
+            var bounds = element.getBoundingClientRect();
+            if (!bounds.width || !bounds.height) throw new Error('Question content is empty');
+            var width = bounds.width;
+            var height = bounds.height;
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+            var scaleX, scaleY;
+            var lastCapture = 0;
+            for (var y = 0; y < height - 0.01;) {
+                var rowHeight = height - y;
+                for (var x = 0; x < width - 0.01;) {
+                    // Move each scroll container only as far as it can go. Any
+                    // remaining distance is handled by its parent/window.
+                    ancestors.forEach(function (item) {
+                        if (item.node === document.scrollingElement) return;
+                        var r = element.getBoundingClientRect();
+                        var parent = item.node.getBoundingClientRect();
+                        item.node.scrollLeft += r.left + x - parent.left - item.node.clientLeft;
+                        item.node.scrollTop += r.top + y - parent.top - item.node.clientTop;
+                    });
+                    var rect = element.getBoundingClientRect();
+                    window.scrollBy({ left: rect.left + x, top: rect.top + y, behavior: 'instant' });
+                    await waitForCaptureLayout(element);
+                    rect = element.getBoundingClientRect();
+                    var area = clampCaptureArea(rect);
+                    ancestors.forEach(function (item) {
+                        if (item.node === document.scrollingElement) return;
+                        var style = getComputedStyle(item.node);
+                        var parent = item.node.getBoundingClientRect();
+                        var right = area.x + area.w;
+                        var bottom = area.y + area.h;
+                        if (/(auto|scroll|hidden|clip)/.test(style.overflowX)) {
+                            area.x = Math.max(area.x, parent.left + item.node.clientLeft);
+                            right = Math.min(right, parent.left + item.node.clientLeft + item.node.clientWidth);
+                        }
+                        if (/(auto|scroll|hidden|clip)/.test(style.overflowY)) {
+                            area.y = Math.max(area.y, parent.top + item.node.clientTop);
+                            bottom = Math.min(bottom, parent.top + item.node.clientTop + item.node.clientHeight);
+                        }
+                        area.w = right - area.x;
+                        area.h = bottom - area.y;
+                    });
+                    var sourceX = rect.left + x;
+                    var sourceY = rect.top + y;
+                    var tileWidth = Math.min(width - x, area.x + area.w - sourceX);
+                    var tileHeight = Math.min(height - y, area.y + area.h - sourceY);
+                    if (sourceX < area.x - 0.5 || sourceY < area.y - 0.5 || tileWidth <= 0 || tileHeight <= 0) {
+                        throw new Error('Unable to bring the entire question into view');
+                    }
+                    // Chrome allows at most two visible-tab captures per second.
+                    await new Promise(function (resolve) {
+                        setTimeout(resolve, Math.max(0, 550 - (Date.now() - lastCapture)));
+                    });
+                    await waitForCaptureLayout(element);
+                    var before = element.getBoundingClientRect();
+                    if (before.left !== rect.left || before.top !== rect.top ||
+                        before.width !== width || before.height !== height) {
+                        throw new Error('The question moved during capture. Please try again.');
+                    }
+                    lastCapture = Date.now();
+                    var image = await loadCaptureImage(await requestVisibleTabCapture(format));
+                    var after = element.getBoundingClientRect();
+                    if (after.left !== before.left || after.top !== before.top ||
+                        after.width !== width || after.height !== height) {
+                        throw new Error('The question moved during capture. Please try again.');
+                    }
+                    if (scaleX === undefined) {
+                        // Derive scale from actual pixels, including browser zoom.
+                        scaleX = image.naturalWidth / window.innerWidth;
+                        scaleY = image.naturalHeight / window.innerHeight;
+                        canvas.width = Math.max(1, Math.round(width * scaleX));
+                        canvas.height = Math.max(1, Math.round(height * scaleY));
+                    }
+                    var left = Math.round(x * scaleX);
+                    var top = Math.round(y * scaleY);
+                    var tilePixelsX = Math.round((x + tileWidth) * scaleX) - left;
+                    var tilePixelsY = Math.round((y + tileHeight) * scaleY) - top;
+                    context.drawImage(image, sourceX * scaleX, sourceY * scaleY,
+                        tileWidth * scaleX, tileHeight * scaleY,
+                        left, top, tilePixelsX, tilePixelsY);
+                    rowHeight = Math.min(rowHeight, tileHeight);
+                    x += tileWidth;
+                }
+                y += rowHeight;
+            }
+            return canvas.toDataURL('image/' + format);
+        } finally {
+            ancestors.forEach(function (item) {
+                item.node.scrollLeft = item.left;
+                item.node.scrollTop = item.top;
+            });
+            window.scrollTo({ left: scrollX, top: scrollY, behavior: 'instant' });
+            savedStyles.reverse().forEach(function (item) {
+                if (item[2]) item[0].style.setProperty(item[1], item[2], item[3]);
+                else item[0].style.removeProperty(item[1]);
+            });
+        }
     };
 
     var downloadDataUrl = function (dataUrl, fileName) {
@@ -1080,69 +1129,8 @@ var webworkSetup = async function () {
                 return;
             }
 
-            var initialRect = questionElement.getBoundingClientRect();
-            if (initialRect.top < 0 || initialRect.bottom > window.innerHeight) {
-                questionElement.scrollIntoView({ behavior: 'auto', block: 'start' });
-                await new Promise(function (resolve) {
-                    if (typeof requestAnimationFrame !== 'function') {
-                        setTimeout(resolve, 50);
-                        return;
-                    }
-                    requestAnimationFrame(function () {
-                        requestAnimationFrame(resolve);
-                    });
-                });
-            }
-
-            // Temporarily hide elements that might block the screenshot
-            var elementsToHide = [];
-            var selectors = [
-                '.masthead', '.row.sticky-nav'
-            ];
-            
-            selectors.forEach(function(selector) {
-                var elements = document.querySelectorAll(selector);
-                elements.forEach(function(el) {
-                    var rect = el.getBoundingClientRect();
-                    var qRect = questionElement.getBoundingClientRect();
-                    // Only hide if element overlaps with question element
-                    if (rect.bottom > qRect.top && rect.top < qRect.bottom) {
-                        elementsToHide.push({
-                            element: el,
-                            originalDisplay: el.style.display,
-                            originalVisibility: el.style.visibility
-                        });
-                        el.style.display = 'none';
-                    }
-                });
-            });
-
-            // After hiding elements, scroll to fit the problem element properly
-            await new Promise(function (resolve) {
-                if (typeof requestAnimationFrame !== 'function') {
-                    setTimeout(resolve, 50);
-                    return;
-                }
-                requestAnimationFrame(function () {
-                    requestAnimationFrame(resolve);
-                });
-            });
-
-            // Ensure the element is properly positioned after hiding overlays
-            questionElement.scrollIntoView({ behavior: 'auto', block: 'start', inline: 'nearest' });
-            
-            // Wait for scroll and layout to complete
-            await new Promise(function (resolve) {
-                if (typeof requestAnimationFrame !== 'function') {
-                    setTimeout(resolve, 100);
-                    return;
-                }
-                requestAnimationFrame(function () {
-                    requestAnimationFrame(function() {
-                        setTimeout(resolve, 50);
-                    });
-                });
-            });
+            if (screenshotButton.disabled) return;
+            screenshotButton.disabled = true;
 
             try {
                 await ensureCapturePermission();
@@ -1169,11 +1157,7 @@ var webworkSetup = async function () {
                 console.error("Screenshot failed:", error);
                 alert("Screenshot failed: " + error.message);
             } finally {
-                // Restore hidden elements
-                elementsToHide.forEach(function(item) {
-                    item.element.style.display = item.originalDisplay;
-                    item.element.style.visibility = item.originalVisibility;
-                });
+                screenshotButton.disabled = false;
             }
         });
     
