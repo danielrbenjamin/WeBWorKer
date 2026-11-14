@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WeBWorKer study mode checks</title>
+    <link rel="stylesheet" href="../spoiler-guard.css">
+    <style>
+        body { max-width: 800px; margin: 30px auto; padding: 0 20px 90px; color: #374151; font: 15px/1.6 system-ui; }
+        h1 { font-size: 24px; } input, select, button { font: inherit; padding: 6px; }
+        table { border-collapse: collapse; } td, th { border: 1px solid #ddd; padding: 8px; }
+        .fixture-card { border: 1px solid #ddd; border-radius: 6px; padding: 16px; margin: 16px 0; }
+        #report { white-space: pre-wrap; } #report[data-result="pass"] { color: #166534; }
+        #report[data-result="fail"] { color: #b91c1c; }
+    </style>
+    <script src="extension-api-fixture.js"></script>
+    <script src="../spoiler-guard-config.js"></script>
+    <script src="../spoiler-guard.js"></script>
+</head>
+<body>
+    <h1>WeBWorKer study mode checks</h1>
+    <p>This fixture uses real browser rendering with simulated extension APIs.</p>
+    <button type="button" id="run">Run browser checks</button>
+    <pre id="report" role="status">Ready</pre>
+    <section class="fixture-card">
+        <h2>Practice problem</h2>
+        <p>Evaluate the expression and enter your answer.</p>
+        <form id="problemMainForm">
+            <label>Your answer <input name="AnSwEr0001" id="AnSwEr0001" value="42"></label>
+            <label>Choose <select name="AnSwEr0002"><option value="a">A</option><option value="b" selected>B</option></select></label>
+            <label>Choice A <input type="radio" name="AnSwEr0003" value="a" checked></label>
+            <label>Choice B <input type="radio" name="AnSwEr0003" value="b"></label>
+            <input name="AnSwEr0004" id="AnSwEr0004" value="x^2" type="hidden">
+            <span id="MaThQuIlL_AnSwEr0004"><span class="mq-root-block"><span>x²</span></span></span>
+            <p><label><input type="checkbox" name="showCorrectAnswers" checked> Show answers</label></p>
+            <input type="hidden" name="showSolutions" value="1">
+            <a id="next" href="?showCorrectAnswers=1&amp;showSolutions=1&amp;other=keep">Next problem</a>
+        </form>
+        <p class="correct_answer">The correct answer is 42.</p>
+        <p class="answer-correct">Your answer is correct.</p>
+        <p class="solution">Solution: evaluate the expression.</p>
+        <div class="progress">100%</div>
+        <p class="custom-spoiler">A school-specific spoiler</p>
+        <ul class="problem-list"><li><a class="nav-link" href="#">Problem 1 ✓</a></li></ul>
+        <table id="results"><thead><tr><th>Problem</th><th>Correct Answer</th><th>Score</th></tr></thead><tbody><tr><td>1</td><td>42</td><td>100%</td></tr></tbody></table>
+    </section>
+    <script src="spoiler-guard-browser-checks.js"></script>
+</body>
+</html>

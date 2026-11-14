@@ -89,6 +89,15 @@ var buildFeatureToggles = function () {
             wrapper.appendChild(info);
             wrapper.appendChild(label);
 
+            if (def.storageKey === 'spoilerGuardEnabled') {
+                wrapper.classList.add('spoiler-guard-setting');
+                var toggleRow = document.createElement('div');
+                toggleRow.className = 'spoiler-guard-toggle-row';
+                toggleRow.append(info, label);
+                wrapper.append(toggleRow, buildSpoilerGuardSettings(input));
+                input.setAttribute('aria-label', def.label);
+            }
+
             // Add screenshot settings if this is the screenshot button toggle
             if (def.storageKey === 'screenshotButtonEnabled') {
                 // Modify wrapper to be a column layout

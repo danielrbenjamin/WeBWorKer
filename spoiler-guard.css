@@ -1,0 +1,233 @@
+/* Adapted from WeBWorK Spoiler Guard, Copyright (c) 2026 Abhinav Nair.
+ * MIT License: LICENSES/WeBWorK Spoiler Guard LICENSE.txt.
+ * https://github.com/Palingenos/Webwork-Spoiler-Guard
+ * Only enabled categories are hidden; disabling study mode restores the page.
+ */
+
+html[data-wwh-answers="on"] :is(
+  .wwh-mark-answers,
+  .correct_answer,
+  .answer-preview,
+  td.correct-answer,
+  .ww-correct-answer,
+  [data-wwh-extra]
+) { display: none !important; }
+
+html[data-wwh-mode="blur"][data-wwh-answers="on"] :is(
+  .wwh-mark-answers,
+  .correct_answer,
+  .answer-preview,
+  td.correct-answer,
+  .ww-correct-answer,
+  [data-wwh-extra]
+) {
+  display: revert !important;
+  filter: blur(6px) !important;
+  transition: filter 120ms ease-out;
+  cursor: help;
+}
+
+html[data-wwh-mode="blur"][data-wwh-answers="on"] :is(
+  .wwh-mark-answers,
+  .correct_answer,
+  .answer-preview,
+  td.correct-answer,
+  .ww-correct-answer,
+  [data-wwh-extra]
+):hover { filter: none !important; }
+
+html[data-wwh-results="on"] :is(
+  .wwh-mark-results,
+  table.attemptResults,
+  .attemptResults,
+  .attemptResultsSummary,
+  .ww-feedback,
+  .ww-feedback-popover,
+  .feedback-btn-container,
+  button.ww-feedback-btn,
+  .answer-correct,
+  .answer-incorrect,
+  td.correct,
+  td.incorrect,
+  span.correct,
+  span.incorrect,
+  div.correct,
+  div.incorrect,
+  .ResultsWithoutError,
+  .ResultsWithError,
+  img[src*="check"],
+  img[alt*="correct" i],
+  i.fa-check,
+  i.fa-check-circle,
+  i.fa-times,
+  i.fa-times-circle,
+  i.fa-circle-check,
+  i.fa-circle-xmark
+) { display: none !important; }
+
+html[data-wwh-mode="blur"][data-wwh-results="on"] :is(
+  .wwh-mark-results,
+  table.attemptResults,
+  .attemptResults,
+  .attemptResultsSummary,
+  .ww-feedback,
+  .ww-feedback-popover,
+  .feedback-btn-container,
+  button.ww-feedback-btn,
+  .answer-correct,
+  .answer-incorrect,
+  td.correct,
+  td.incorrect,
+  span.correct,
+  span.incorrect,
+  div.correct,
+  div.incorrect,
+  .ResultsWithoutError,
+  .ResultsWithError,
+  img[src*="check"],
+  img[alt*="correct" i],
+  i.fa-check,
+  i.fa-check-circle,
+  i.fa-times,
+  i.fa-times-circle,
+  i.fa-circle-check,
+  i.fa-circle-xmark
+) {
+  display: revert !important;
+  filter: blur(6px) !important;
+  transition: filter 120ms ease-out;
+  cursor: help;
+}
+
+html[data-wwh-mode="blur"][data-wwh-results="on"] :is(
+  .wwh-mark-results,
+  table.attemptResults,
+  .attemptResults,
+  .attemptResultsSummary,
+  .ww-feedback,
+  .ww-feedback-popover,
+  .feedback-btn-container,
+  button.ww-feedback-btn,
+  .answer-correct,
+  .answer-incorrect,
+  td.correct,
+  td.incorrect,
+  span.correct,
+  span.incorrect,
+  div.correct,
+  div.incorrect,
+  .ResultsWithoutError,
+  .ResultsWithError,
+  img[src*="check"],
+  img[alt*="correct" i],
+  i.fa-check,
+  i.fa-check-circle,
+  i.fa-times,
+  i.fa-times-circle,
+  i.fa-circle-check,
+  i.fa-circle-xmark
+):hover { filter: none !important; }
+
+html[data-wwh-scores="on"] :is(
+  .wwh-mark-scores,
+  #score-table,
+  .score-table,
+  .problem-grader,
+  .grade-table td:not(:first-child),
+  .progress,
+  .progress-bar,
+  .student-nav-score
+) { display: none !important; }
+
+html[data-wwh-mode="blur"][data-wwh-scores="on"] :is(
+  .wwh-mark-scores,
+  #score-table,
+  .score-table,
+  .problem-grader,
+  .grade-table td:not(:first-child),
+  .progress,
+  .progress-bar,
+  .student-nav-score
+) {
+  display: revert !important;
+  filter: blur(6px) !important;
+  transition: filter 120ms ease-out;
+  cursor: help;
+}
+
+html[data-wwh-mode="blur"][data-wwh-scores="on"] :is(
+  .wwh-mark-scores,
+  #score-table,
+  .score-table,
+  .problem-grader,
+  .grade-table td:not(:first-child),
+  .progress,
+  .progress-bar,
+  .student-nav-score
+):hover { filter: none !important; }
+
+html[data-wwh-solutions="on"] :is(
+  .wwh-mark-solutions,
+  .solution,
+  .hint,
+  #solution,
+  #hint,
+  .ww-solution,
+  .ww-hint
+) { display: none !important; }
+
+html[data-wwh-mode="blur"][data-wwh-solutions="on"] :is(
+  .wwh-mark-solutions,
+  .solution,
+  .hint,
+  #solution,
+  #hint,
+  .ww-solution,
+  .ww-hint
+) {
+  display: revert !important;
+  filter: blur(6px) !important;
+  transition: filter 120ms ease-out;
+  cursor: help;
+}
+
+html[data-wwh-mode="blur"][data-wwh-solutions="on"] :is(
+  .wwh-mark-solutions,
+  .solution,
+  .hint,
+  #solution,
+  #hint,
+  .ww-solution,
+  .ww-hint
+):hover { filter: none !important; }
+
+#wwh-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  background: #fff;
+  color: #374151;
+  font: 13px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+#wwh-panel button {
+  appearance: none;
+  padding: 6px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  background: #f9fafb;
+  color: #374151;
+  font: inherit;
+  cursor: pointer;
+}
+#wwh-panel button:hover { background: #f3f4f6; }
+#wwh-panel button:focus-visible { outline: 2px solid #667eea; outline-offset: 2px; }
+#wwh-panel [data-action="peek"] { background: #667eea; border-color: #667eea; color: white; }
+#wwh-panel[data-state="revealed"] [data-action="peek"] { background: #764ba2; }

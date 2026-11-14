@@ -34,6 +34,27 @@
       "service_worker": "worker.js"
    },
 
+   "content_scripts": [
+      {
+         "matches": ["*://*/webwork2/*", "*://*/webwork/*"],
+         "css": ["spoiler-guard.css"],
+         "js": ["spoiler-guard-config.js", "spoiler-guard.js"],
+         "run_at": "document_start",
+         "all_frames": true
+      }
+   ],
+
+   "commands": {
+      "spoiler-guard-peek": {
+         "suggested_key": { "default": "Alt+Shift+P" },
+         "description": "Peek at hidden answers and feedback"
+      },
+      "spoiler-guard-toggle-site": {
+         "suggested_key": { "default": "Alt+Shift+H" },
+         "description": "Turn study mode on or off for this site"
+      }
+   },
+
    "web_accessible_resources": [
       {
          "resources": [

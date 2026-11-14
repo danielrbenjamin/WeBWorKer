@@ -194,6 +194,7 @@ var ExtConfig = new function () {
     // Toggle definitions used by popup to dynamically render feature toggles.
     // Each entry: { id: DOM id for checkbox, storageKey: key in chrome.storage.sync, label: user-visible label, default: boolean }
     this.toggleDefinitions = [
+        { id: "toggleSpoilerGuard", storageKey: "spoilerGuardEnabled", label: "Study Mode (Hide Spoilers)", default: false, hasOptions: true },
         { id: "toggleClearAnswers", storageKey: "clearAnswersEnabled", label: "Toggle Clear Answers Button", default: true },
         { id: "togglePiazzaButton", storageKey: "piazzaEnabled", label: "Toggle Open Piazza Button", default: true },
         { id: "toggleResourcesButton", storageKey: "resourcesEnabled", label: "Toggle Online Resources Button", default: true },

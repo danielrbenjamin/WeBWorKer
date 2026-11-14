@@ -44,3 +44,25 @@ Built on the shoulders of giants:
 - [WeBWorKMathView by Noah Tajwar](https://github.com/noaht11/WeBWorKMathView)
 - [WeBWorK Parentheses Checker by James Yuzawa](https://github.com/yuzawa-san/webwork-parentheses-checker)
 - [WeBWorK AlphaLinK by Munro Anderson](https://github.com/munr0/WeBWorK-AlphaLinK)
+- [WeBWorK Spoiler Guard by Abhinav Nair (Palingenos)](https://github.com/Palingenos/Webwork-Spoiler-Guard): study-mode spoiler detection and hiding, adapted for WeBWorKer's controls and settings. The original [MIT license](LICENSES/WeBWorK%20Spoiler%20Guard%20LICENSE.txt) is included.
+
+# Study Mode
+
+Enable **Study Mode (Hide Spoilers)** in the WeBWorKer popup when you want to practice old problems. It is off by default and updates open WeBWorK pages when you change its settings.
+
+- Independently hide revealed answers, correctness feedback, scores and attempts, or solutions and hints.
+- Clear previously filled answers locally while preserving answers you type yourself. Peek temporarily restores previous answers in untouched boxes.
+- Use **Peek** on the page or in the popup, or press **Alt+Shift+P**, to reveal and hide spoilers.
+- Turn study mode on or off for one site using the on-page controls, the popup, or **Alt+Shift+H**.
+- Choose **Hide** or **Blur (hover to reveal)** in Study mode settings. Advanced settings accept additional CSS selectors, one per line.
+- Keep answer and solution requests off in navigation and submitted forms while the corresponding hiding category is enabled.
+
+Study mode runs on `/webwork2/` and `/webwork/` pages. It changes the local display and answer fields; recorded grades and previous submissions stay on the server. Peek can only reveal content already loaded on the page. To request a solution the page has not loaded, turn off study mode and use WeBWorK's own solution controls.
+
+After updating an unpacked extension, reload WeBWorKer from your browser's extensions page and refresh open WeBWorK pages. Other WeBWorKer features keep their existing site controls.
+
+# Development checks
+
+Run the focused screenshot and study-mode checks with `node --test tests/*.test.cjs`.
+
+For browser-rendered checks, run `node tests/serve-browser-checks.cjs` and open the printed local test URL. This fixture runs the production study-mode scripts against sample WeBWorK markup with simulated Chrome APIs. The server also provides a popup preview. These checks do not replace loading the unpacked extension and checking it against a real WeBWorK page.
