@@ -1516,7 +1516,9 @@ let confirmationEnabled = true;
 
 function confirmSubmit() {
   const scoreSummary = document.getElementById('score_summary');
-  const hasUnlimited = scoreSummary && scoreSummary.innerText.toLowerCase().includes('unlimited');
+  // Study mode can hide parts of the summary. Read the underlying text so
+  // presentation changes do not affect attempt-limit detection.
+  const hasUnlimited = scoreSummary && scoreSummary.textContent.toLowerCase().includes('unlimited');
 
   return confirmationEnabled && !hasUnlimited ? confirm("LIMITED ATTEMPTS!! Are you sure you want to submit?") : true;
 }
