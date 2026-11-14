@@ -16,7 +16,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     } else if (details.reason === 'update') {
         // Check if user wants to see onboarding on updates
         chrome.storage.local.get(['showOnboardingOnUpdate'], (result) => {
-            if (result.showOnboardingOnUpdate !== false) { // default true
+            if (result.showOnboardingOnUpdate === true) { // opt in; default off
                 chrome.tabs.create({ url: 'onboarding.html' });
             }
         });

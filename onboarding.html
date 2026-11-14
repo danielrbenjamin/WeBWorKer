@@ -3,152 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to WeBWorKer</title>
+    <meta name="color-scheme" content="light">
+    <title>WeBWorKer</title>
+    <link rel="icon" href="icon/icon32.png">
+    <link rel="stylesheet" href="lib/katex/katex.css">
     <link rel="stylesheet" href="onboarding.css">
-    <script src="ext-config.js"></script>
+    <script src="ext-config.js" defer></script>
+    <script src="lib/katex/katex.min.js" defer></script>
+    <script src="lib/asciimath/ASCIIMathTeXImg.js" defer></script>
+    <script src="onboarding.js" defer></script>
 </head>
 <body>
-    <div class="container">
-        <header class="hero">
-            <img src="icon/icon128.png" alt="WeBWorKer Icon" class="hero-icon">
-            <h1>Welcome to WeBWorKer!</h1>
-            <p class="version">Version <span id="version">2.1.1</span></p>
-            <p class="author">Created by <strong><a href="https://www.linkedin.com/in/danielrbenjamin/" target="_blank">Daniel Benjamin</a></strong></p>
-            <p class="subtitle">Your ultimate companion for WebWork problems</p>
-        </header>
-
-        <section class="update-notice" id="updateNotice" style="display: none;">
-            <h2>🎉 What's New</h2>
-            <ul id="updateList"></ul>
-        </section>
-
-        <section class="getting-started">
-            <h2>Getting Started</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h3>Enable on Your WebWork Site</h3>
-                        <p>Click the extension icon in your browser toolbar when you're on a WebWork page, then toggle "Enable On This Site" or "Enable Globally".</p>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+        <a class="brand" href="#main" aria-label="WeBWorKer home"><img src="icon/icon48.png" width="30" height="30" alt=""><span>WeBWorKer<span class="brand-period">.</span></span></a>
+        <nav aria-label="Page navigation">
+            <a href="#setup">setup</a><a href="#tools">tools</a><a href="#settings">settings</a>
+            <a class="author-link" href="https://www.danielrbenjamin.com/" target="_blank" rel="noopener noreferrer">danielrbenjamin.com <span aria-hidden="true">↗</span></a>
+        </nav>
+    </header>
+    <main id="main" class="page-shell">
+        <section class="hero" aria-labelledby="page-title">
+            <div class="hero-copy">
+                <p class="eyebrow">An extension for WeBWorK <span class="version">v<span id="version">—</span></span></p>
+                <h1 id="page-title">WeB<span class="title-accent">WorKer</span><span class="title-period">.</span></h1>
+                <p class="hero-description">See what you’re typing.<br>Keep your tools beside the problem.</p>
+                <p class="hero-detail">Live math previews, a calculator, variables, and a fresh start on old problem sets.</p>
+                <div class="hero-actions"><a class="button" href="#setup">Get set up</a><a class="button" href="#settings">Choose your tools</a></div>
+                <p class="hero-credit">Built by <a href="https://www.danielrbenjamin.com/" target="_blank" rel="noopener noreferrer">Daniel Benjamin</a></p>
+            </div>
+            <div class="preview-workspace" aria-labelledby="preview-heading">
+                <div class="workspace-header"><span id="preview-heading">Math preview</span><span class="workspace-caption">try it here</span></div>
+                <div class="workspace-body">
+                    <label for="expression">Type a WeBWorK expression</label>
+                    <input id="expression" type="text" value="(-b + sqrt(b^2 - 4*a*c))/(2*a)" autocomplete="off" spellcheck="false" maxlength="500" aria-describedby="preview-hint bracket-status">
+                    <div class="expression-presets" aria-label="Example expressions"><button type="button" data-expression="(-b + sqrt(b^2 - 4*a*c))/(2*a)" aria-pressed="true">quadratic</button><button type="button" data-expression="sin(x)^2 + cos(x)^2" aria-pressed="false">trig</button><button type="button" data-expression="(x^2 + 1)/(x - 2)" aria-pressed="false">fraction</button></div>
+                    <div class="math-output" id="math-preview" aria-label="Rendered expression"></div>
+                    <p id="preview-hint" class="preview-hint" role="status">Edit the expression to see the preview change.</p>
+                    <div class="bracket-preview">
+                        <div class="bracket-heading"><span>Bracket checker</span><span id="bracket-status" role="status"></span></div>
+                        <div id="bracket-expression" class="bracket-expression" aria-label="Expression with matching brackets highlighted"></div>
+                        <div class="expression-presets bracket-presets" aria-label="Bracket examples">
+                            <button type="button" data-expression="(x + [2*y])" aria-pressed="false">matching pairs</button>
+                            <button type="button" data-expression="(x + 2" aria-pressed="false">missing bracket</button>
+                            <button type="button" data-expression="(x + 2]" aria-pressed="false">wrong pair</button>
+                        </div>
                     </div>
                 </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h3>Refresh the Page</h3>
-                        <p>After enabling the extension, refresh your WebWork page to see all the features in action.</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h3>Customize Your Experience</h3>
-                        <p>Open the extension popup to configure features and customize settings to your preference.</p>
-                    </div>
-                </div>
+                <div class="workspace-footer"><span class="coordinate-mark" aria-hidden="true">ƒ(x)</span><span>The same preview used in your answer fields.</span></div>
             </div>
         </section>
-
-        <section class="features">
-            <h2>Features</h2>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">📐</div>
-                    <h3>Live Math Preview</h3>
-                    <p>See your mathematical expressions rendered in real-time as you type using KaTeX.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>Desmos Side Panel</h3>
-                    <p>Access Desmos Scientific or Graphing calculator in Chrome's native side panel with a floating button.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔢</div>
-                    <h3>Variable Management</h3>
-                    <p>Parse and use variables from problem text. Define custom variables and use Ctrl+Enter to substitute them.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📸</div>
-                    <h3>Smart Screenshots</h3>
-                    <p>Capture clean screenshots of problems without headers. Choose to copy to clipboard or download.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔍</div>
-                    <h3>Quick Resources</h3>
-                    <p>Search for help online, access Piazza, or use custom query buttons to find solutions faster.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">✓</div>
-                    <h3>Parentheses Checker</h3>
-                    <p>Visual validation of matching brackets, parentheses, and braces in your answers.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🗑️</div>
-                    <h3>Clear Answers</h3>
-                    <p>Quickly clear all answer boxes with one click (with confirmation for safety).</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📏</div>
-                    <h3>Resizable Inputs</h3>
-                    <p>Resize answer input boxes to see longer expressions more clearly.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⚠️</div>
-                    <h3>Limited Attempts Warning</h3>
-                    <p>Receive a notification if a question has limited attempts.</p>
-                </div>
+        <aside id="updateNotice" class="release-note" hidden aria-labelledby="update-heading"><p class="eyebrow" id="update-heading">Updated to <span id="updateVersion"></span></p><ul id="updateList"></ul></aside>
+        <section id="setup" class="content-section" aria-labelledby="setup-heading">
+            <div class="section-heading"><p class="eyebrow">01 / Setup</p><h2 id="setup-heading">Start with your course page.</h2></div>
+            <ol class="setup-steps">
+                <li><span class="step-index" aria-hidden="true">01</span><h3>Open WeBWorK</h3><p>Go to your school’s WeBWorK site and open the extension from your browser toolbar.</p></li>
+                <li><span class="step-index" aria-hidden="true">02</span><h3>Enable the extension</h3><p>Turn on <strong>Enable On This Site</strong>, or use <strong>Enable Globally</strong> for all WeBWorK sites.</p></li>
+                <li><span class="step-index" aria-hidden="true">03</span><h3>Refresh the page</h3><p>Your previews and tools will appear beside the problem. Change individual features below.</p></li>
+            </ol>
+        </section>
+        <section id="tools" class="content-section" aria-labelledby="tools-heading">
+            <div class="section-heading"><p class="eyebrow">02 / Tools</p><h2 id="tools-heading">Tools for your problem set.</h2></div>
+            <div class="tool-grid">
+                <article class="tool-item"><span class="tool-symbol" aria-hidden="true">ƒ</span><div><h3>Read your answer as math</h3><p>Preview expressions as you type, check matching parentheses, and resize fields for longer answers.</p></div></article>
+                <article class="tool-item"><span class="tool-symbol" aria-hidden="true">x =</span><div><h3>Use the problem’s variables</h3><p>Use detected values or define your own. Press <kbd>Ctrl</kbd> + <kbd>Enter</kbd> in an answer field to substitute them.</p></div></article>
+                <article class="tool-item"><span class="tool-symbol" aria-hidden="true">∫</span><div><h3>Keep a calculator open</h3><p>Open Desmos Scientific or Graphing in the side panel without leaving your assignment.</p></div></article>
+                <article class="tool-item"><span class="tool-symbol" aria-hidden="true">[ ]</span><div><h3>Capture the question</h3><p>Copy or download a screenshot of the question. Headers and floating controls stay out of the image.</p></div></article>
+            </div>
+            <div class="study-note">
+                <div><p class="eyebrow">Study mode / Optional</p><h3>Practice old problems again.</h3><p>Hide previous answers, correctness feedback, scores, and solutions. Peek when you’re ready to check. Your new answers are preserved.</p></div>
+                <dl class="shortcut-list"><div><dt>Peek / hide again</dt><dd><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></dd></div><div><dt>Study mode on / off</dt><dd><kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>H</kbd></dd></div></dl>
             </div>
         </section>
-
-        <section class="tips">
-            <h2>Pro Tips</h2>
-            <div class="tips-list">
-                <div class="tip">
-                    <strong>Variable Substitution:</strong> Type variables like "k*x*2" in answer boxes and press <kbd>Ctrl+Enter</kbd> to automatically substitute values from the problem.
-                </div>
-                <div class="tip">
-                    <strong>Custom Variables:</strong> Define your own variables using the panel above problem statements for quick calculations.
-                </div>
-                <div class="tip">
-                    <strong>Screenshot Mode:</strong> Set your preferred screenshot mode (copy or download) in the extension settings popup.
-                </div>
-                <div class="tip">
-                    <strong>Custom Queries:</strong> Configure your preferred assistant or search engine in the extension popup for quick problem lookups.
-                </div>
-            </div>
+        <section id="settings" class="content-section" aria-labelledby="settings-heading">
+            <div class="section-heading settings-heading"><div><p class="eyebrow">03 / Settings</p><h2 id="settings-heading">Keep what you use.</h2></div><p id="settings-status" role="status">Changes save automatically</p></div>
+            <div id="settingsToggles" class="settings-toggles"></div>
+            <p class="settings-footnote">Refresh your WeBWorK page after changing these settings. Study mode updates immediately; its detailed controls are in the toolbar popup.</p>
+            <label class="update-preference"><input type="checkbox" id="showOnUpdates"><span>Open this page after extension updates</span></label>
         </section>
-
-        <section class="settings-preview">
-            <h2>Quick Settings</h2>
-            <p>Customize your WeBWorKer experience:</p>
-            <div id="settingsToggles" class="settings-toggles">
-                <!-- Toggles will be dynamically inserted here -->
-            </div>
-        </section>
-
-        <section class="support">
-            <h2>Support & Feedback</h2>
-            <p>Enjoying WeBWorKer? Consider supporting the development:</p>
-            <div class="support-buttons">
-                <a href="https://www.buymeacoffee.com/danielrbenjamin" target="_blank" class="support-button donate">
-                    ☕ Buy Me a Coffee
-                </a>
-                <a href="https://github.com/danielrbenjamin/WeBWorKer" target="_blank" class="support-button github">
-                    ⭐ Star on GitHub
-                </a>
-            </div>
-            <p class="feedback-text">Found a bug or have a feature request? <a href="https://github.com/danielrbenjamin/WeBWorKer/issues" target="_blank">Report it on GitHub</a></p>
-        </section>
-
-        <footer>
-            <p class="footer-author">Made with ❤️ by <strong>Daniel Benjamin</strong></p>
-            <p class="footer-copyright">© 2025 Daniel Benjamin. All rights reserved.</p>
-            <p class="footer-links">
-                <a href="#" id="dontShowAgain">Don't show this on updates</a>
-            </p>
+        <footer class="site-footer">
+            <div class="footer-author"><span class="eyebrow">By Daniel Benjamin</span><p>More engineering &amp; software projects.</p><a class="portfolio-link" href="https://www.danielrbenjamin.com/" target="_blank" rel="noopener noreferrer">danielrbenjamin.com <span aria-hidden="true">↗</span></a></div>
+            <div class="footer-links"><a href="https://github.com/danielrbenjamin/WeBWorKeR" target="_blank" rel="noopener noreferrer">Source code ↗</a><a href="https://github.com/danielrbenjamin/WeBWorKeR/issues" target="_blank" rel="noopener noreferrer">Report an issue ↗</a><a href="https://www.buymeacoffee.com/danielrbenjamin" target="_blank" rel="noopener noreferrer">Support the project ↗</a></div>
+            <p class="footer-note">WeBWorKer is an independent extension and is not affiliated with or endorsed by the WeBWorK Project, MAA, or UBC. Use it in accordance with your course policies.</p>
         </footer>
-    </div>
-
-    <script src="onboarding.js"></script>
+    </main>
 </body>
 </html>

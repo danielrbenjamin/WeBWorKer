@@ -1,339 +1,270 @@
-console.log("[WeBWorKer] onboarding.js loaded");
-
-// Get the extension version
+/* Onboarding and settings. Uses only the extension's bundled assets. */
 const manifest = chrome.runtime.getManifest();
 document.getElementById('version').textContent = manifest.version;
 
-// Build the settings toggles
-function buildSettingsToggles() {
+const settingCopy = {
+    spoilerGuardEnabled: ['Study mode', 'Hide spoilers when revisiting old problems.'],
+    clearAnswersEnabled: ['Clear answers button', 'Clear all answer fields with confirmation.'],
+    piazzaEnabled: ['Piazza shortcut', 'Open your course discussion board.'],
+    resourcesEnabled: ['Online resources', 'Add quick links for problem lookups.'],
+    checkParenthesesEnabled: ['Parentheses checker', 'Check that brackets and parentheses match.'],
+    variableSubstitutionEnabled: ['Variable substitution', 'Use detected values and your own variables.'],
+    screenshotButtonEnabled: ['Question screenshots', 'Copy or download the question as an image.'],
+    customQueryEnabled: ['Custom search shortcut', 'Choose the service used for problem lookups.'],
+    sidePanelButtonEnabled: ['Calculator button', 'Show the floating button for the Desmos panel.']
+};
+
+let statusTimer;
+async function saveSettings(patch, area = 'sync') {
+    const status = document.getElementById('settings-status');
+    clearTimeout(statusTimer);
+    try {
+        await chrome.storage[area].set(patch);
+        status.textContent = 'Saved';
+        status.dataset.state = 'saved';
+        statusTimer = setTimeout(() => {
+            status.textContent = 'Changes save automatically';
+            delete status.dataset.state;
+        }, 2500);
+    } catch {
+        status.textContent = 'Could not save. Please try again.';
+        status.dataset.state = 'error';
+    }
+}
+
+function createOptions(title) {
+    const container = document.createElement('div');
+    container.className = 'setting-options';
+    const fields = document.createElement('fieldset');
+    const legend = document.createElement('legend');
+    legend.textContent = title;
+    fields.appendChild(legend);
+    container.appendChild(fields);
+    return { container, fields };
+}
+
+function screenshotOptions(settings) {
+    const options = createOptions('Screenshot destination');
+    const choices = document.createElement('div');
+    choices.className = 'screenshot-options';
+    for (const [value, text] of [['copy', 'Clipboard'], ['download', 'Download']]) {
+        const label = document.createElement('label');
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'screenshotMode';
+        input.value = value;
+        input.checked = settings.screenshotMode === value;
+        input.addEventListener('change', () => { if (input.checked) saveSettings({ screenshotMode: value }); });
+        label.append(input, document.createTextNode(text));
+        choices.appendChild(label);
+    }
+    options.fields.appendChild(choices);
+    return options;
+}
+
+function customQueryOptions(settings) {
+    const options = createOptions('Search URL and button text');
+    options.fields.className = 'query-options';
+    for (const [key, text, placeholder] of [
+        ['customQueryUrl', 'Search URL', 'https://www.google.com/search?q='],
+        ['customQueryButtonText', 'Button text', 'Custom Query']
+    ]) {
+        const label = document.createElement('label');
+        label.textContent = text;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = key;
+        input.value = settings[key];
+        input.placeholder = placeholder;
+        input.spellcheck = false;
+        input.addEventListener('change', () => saveSettings({ [key]: input.value }));
+        label.appendChild(input);
+        options.fields.appendChild(label);
+    }
+    return options;
+}
+
+async function buildSettingsToggles() {
     const container = document.getElementById('settingsToggles');
-    if (!container || !ExtConfig || !ExtConfig.toggleDefinitions) return;
-
-    // Build defaults object
-    const defaults = {};
-    ExtConfig.toggleDefinitions.forEach(def => {
-        defaults[def.storageKey] = def.default;
-    });
-
-    // Get current settings
-    chrome.storage.sync.get(defaults, (result) => {
-        ExtConfig.toggleDefinitions.forEach(def => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'toggle-item';
-
-            const label = document.createElement('span');
+    const defaults = Object.fromEntries(ExtConfig.toggleDefinitions.map(def => [def.storageKey, def.default]));
+    try {
+        const settings = await chrome.storage.sync.get({
+            ...defaults, screenshotMode: 'copy',
+            customQueryUrl: 'https://www.google.com/search?q=', customQueryButtonText: 'Custom Query'
+        });
+        for (const def of ExtConfig.toggleDefinitions) {
+            const [title, description] = settingCopy[def.storageKey] || [def.label, ''];
+            const item = document.createElement('div');
+            item.className = 'toggle-item';
+            const row = document.createElement('div');
+            row.className = 'toggle-row';
+            const info = document.createElement('div');
+            info.className = 'toggle-info';
+            const id = 'onboarding_' + def.id;
+            const label = document.createElement('label');
             label.className = 'toggle-label';
-            label.textContent = def.label;
-
-            const switchLabel = document.createElement('label');
-            switchLabel.className = 'switch';
-
+            label.htmlFor = id;
+            label.textContent = title;
+            const hint = document.createElement('p');
+            hint.className = 'toggle-description';
+            hint.id = id + '_description';
+            hint.textContent = description;
+            info.append(label, hint);
+            const control = document.createElement('div');
+            control.className = 'switch';
             const input = document.createElement('input');
             input.type = 'checkbox';
-            input.checked = !!result[def.storageKey];
-            input.id = 'onboarding_' + def.id;
-
+            input.id = id;
+            input.checked = !!settings[def.storageKey];
+            input.setAttribute('aria-describedby', hint.id);
             const slider = document.createElement('span');
-            slider.className = 'slider round';
-
-            switchLabel.appendChild(input);
-            switchLabel.appendChild(slider);
-
-            // If this toggle has options, use column layout
-            if (def.storageKey === 'screenshotButtonEnabled' || def.storageKey === 'customQueryEnabled') {
-                wrapper.style.flexDirection = 'column';
-                wrapper.style.alignItems = 'stretch';
-
-                // Create a row for the toggle (label and switch)
-                const toggleRow = document.createElement('div');
-                toggleRow.style.display = 'flex';
-                toggleRow.style.alignItems = 'center';
-                toggleRow.style.justifyContent = 'space-between';
-                toggleRow.style.width = '100%';
-
-                toggleRow.appendChild(label);
-                toggleRow.appendChild(switchLabel);
-                wrapper.appendChild(toggleRow);
-            } else {
-                wrapper.appendChild(label);
-                wrapper.appendChild(switchLabel);
+            slider.className = 'slider';
+            slider.setAttribute('aria-hidden', 'true');
+            control.append(input, slider);
+            row.append(info, control);
+            item.appendChild(row);
+            const options = def.storageKey === 'screenshotButtonEnabled' ? screenshotOptions(settings) :
+                def.storageKey === 'customQueryEnabled' ? customQueryOptions(settings) : null;
+            if (options) {
+                options.fields.disabled = !input.checked;
+                item.classList.add('toggle-item-with-options');
+                item.appendChild(options.container);
             }
-
-            // Save on change
-            input.addEventListener('change', function() {
-                const setting = {};
-                setting[def.storageKey] = input.checked;
-                chrome.storage.sync.set(setting);
+            input.addEventListener('change', () => {
+                if (options) options.fields.disabled = !input.checked;
+                saveSettings({ [def.storageKey]: input.checked });
             });
-
-            // Add screenshot settings if this is the screenshot button toggle
-            if (def.storageKey === 'screenshotButtonEnabled') {
-                const screenshotSettings = document.createElement('div');
-                screenshotSettings.style.marginTop = '12px';
-                screenshotSettings.style.marginLeft = '0';
-                screenshotSettings.style.width = '100%';
-
-                const modeLabel = document.createElement('div');
-                modeLabel.textContent = 'Screenshot Mode:';
-                modeLabel.style.fontSize = '13px';
-                modeLabel.style.marginBottom = '8px';
-                modeLabel.style.color = '#666';
-                modeLabel.style.fontWeight = '500';
-
-                const radioContainer = document.createElement('div');
-                radioContainer.style.display = 'flex';
-                radioContainer.style.flexDirection = 'column';
-                radioContainer.style.gap = '8px';
-                radioContainer.style.marginLeft = '8px';
-
-                // Download option
-                const downloadOption = document.createElement('label');
-                downloadOption.style.display = 'flex';
-                downloadOption.style.alignItems = 'center';
-                downloadOption.style.cursor = 'pointer';
-
-                const downloadRadio = document.createElement('input');
-                downloadRadio.type = 'radio';
-                downloadRadio.name = 'screenshotMode';
-                downloadRadio.value = 'download';
-                downloadRadio.id = 'screenshotModeDownload';
-
-                const downloadText = document.createElement('span');
-                downloadText.textContent = 'Download screenshot';
-                downloadText.style.marginLeft = '8px';
-                downloadText.style.fontSize = '13px';
-
-                downloadOption.appendChild(downloadRadio);
-                downloadOption.appendChild(downloadText);
-
-                // Copy option
-                const copyOption = document.createElement('label');
-                copyOption.style.display = 'flex';
-                copyOption.style.alignItems = 'center';
-                copyOption.style.cursor = 'pointer';
-
-                const copyRadio = document.createElement('input');
-                copyRadio.type = 'radio';
-                copyRadio.name = 'screenshotMode';
-                copyRadio.value = 'copy';
-                copyRadio.id = 'screenshotModeCopy';
-
-                const copyText = document.createElement('span');
-                copyText.textContent = 'Copy to clipboard';
-                copyText.style.marginLeft = '8px';
-                copyText.style.fontSize = '13px';
-
-                copyOption.appendChild(copyRadio);
-                copyOption.appendChild(copyText);
-
-                radioContainer.appendChild(downloadOption);
-                radioContainer.appendChild(copyOption);
-
-                // Load saved mode
-                chrome.storage.sync.get({
-                    screenshotMode: 'copy'
-                }, (result) => {
-                    if (result.screenshotMode === 'copy') {
-                        copyRadio.checked = true;
-                    } else {
-                        downloadRadio.checked = true;
-                    }
-                });
-
-                // Save on change
-                const saveScreenshotMode = function() {
-                    const mode = downloadRadio.checked ? 'download' : 'copy';
-                    chrome.storage.sync.set({ screenshotMode: mode });
-                };
-
-                downloadRadio.addEventListener('change', saveScreenshotMode);
-                copyRadio.addEventListener('change', saveScreenshotMode);
-
-                screenshotSettings.appendChild(modeLabel);
-                screenshotSettings.appendChild(radioContainer);
-
-                wrapper.appendChild(screenshotSettings);
-            }
-
-            // Add custom query settings if this is the custom query toggle
-            if (def.storageKey === 'customQueryEnabled') {
-                const customQuerySettings = document.createElement('div');
-                customQuerySettings.style.marginTop = '12px';
-                customQuerySettings.style.marginLeft = '0';
-                customQuerySettings.style.width = '100%';
-
-                // URL input
-                const urlLabel = document.createElement('div');
-                urlLabel.textContent = 'Custom Query URL:';
-                urlLabel.style.fontSize = '13px';
-                urlLabel.style.marginBottom = '4px';
-                urlLabel.style.color = '#666';
-                urlLabel.style.fontWeight = '500';
-
-                const urlInput = document.createElement('input');
-                urlInput.type = 'text';
-                urlInput.id = 'customQueryUrl';
-                urlInput.placeholder = 'https://www.google.com/search?q=';
-                urlInput.style.width = '100%';
-                urlInput.style.padding = '8px';
-                urlInput.style.border = '1px solid rgba(0,0,0,0.2)';
-                urlInput.style.borderRadius = '4px';
-                urlInput.style.fontSize = '13px';
-                urlInput.style.marginBottom = '12px';
-                urlInput.style.boxSizing = 'border-box';
-
-                // Button text input
-                const buttonTextLabel = document.createElement('div');
-                buttonTextLabel.textContent = 'Button Text:';
-                buttonTextLabel.style.fontSize = '13px';
-                buttonTextLabel.style.marginBottom = '4px';
-                buttonTextLabel.style.color = '#666';
-                buttonTextLabel.style.fontWeight = '500';
-
-                const buttonTextInput = document.createElement('input');
-                buttonTextInput.type = 'text';
-                buttonTextInput.id = 'customQueryButtonText';
-                buttonTextInput.placeholder = 'Custom Query';
-                buttonTextInput.style.width = '100%';
-                buttonTextInput.style.padding = '8px';
-                buttonTextInput.style.border = '1px solid rgba(0,0,0,0.2)';
-                buttonTextInput.style.borderRadius = '4px';
-                buttonTextInput.style.fontSize = '13px';
-                buttonTextInput.style.boxSizing = 'border-box';
-
-                // Load saved values
-                chrome.storage.sync.get({
-                    customQueryUrl: 'https://www.google.com/search?q=',
-                    customQueryButtonText: 'Custom Query'
-                }, (result) => {
-                    urlInput.value = result.customQueryUrl;
-                    buttonTextInput.value = result.customQueryButtonText;
-                });
-
-                // Save on change with debounce
-                let saveTimeout;
-                const saveCustomQuerySettings = function() {
-                    clearTimeout(saveTimeout);
-                    saveTimeout = setTimeout(() => {
-                        chrome.storage.sync.set({
-                            customQueryUrl: urlInput.value,
-                            customQueryButtonText: buttonTextInput.value
-                        });
-                    }, 500);
-                };
-
-                urlInput.addEventListener('input', saveCustomQuerySettings);
-                buttonTextInput.addEventListener('input', saveCustomQuerySettings);
-
-                customQuerySettings.appendChild(urlLabel);
-                customQuerySettings.appendChild(urlInput);
-                customQuerySettings.appendChild(buttonTextLabel);
-                customQuerySettings.appendChild(buttonTextInput);
-
-                wrapper.appendChild(customQuerySettings);
-            }
-
-            container.appendChild(wrapper);
-        });
-    });
-}
-
-// Check if this is an update or fresh install
-chrome.storage.local.get(['lastVersion', 'showOnboardingOnUpdate'], async (result) => {
-    const lastVersion = result.lastVersion;
-    const showOnUpdate = result.showOnboardingOnUpdate !== false; // default true
-    const currentVersion = manifest.version;
-
-    if (lastVersion && lastVersion !== currentVersion && showOnUpdate) {
-        // This is an update
-        showUpdateNotice(lastVersion, currentVersion);
-    }
-
-    // Store the current version
-    chrome.storage.local.set({ lastVersion: currentVersion });
-});
-
-// Show update notice with version-specific changes
-function showUpdateNotice(oldVersion, newVersion) {
-    const updateNotice = document.getElementById('updateNotice');
-    const updateList = document.getElementById('updateList');
-    
-    updateNotice.style.display = 'block';
-    
-    // Version-specific updates (you can customize this for each release)
-    const updates = getUpdatesForVersion(newVersion);
-    
-    updates.forEach(update => {
-        const li = document.createElement('li');
-        li.textContent = update;
-        updateList.appendChild(li);
-    });
-}
-
-// Get update notes for specific versions
-function getUpdatesForVersion(version) {
-    const updateNotes = {
-        '2.2.0': [
-            'Replaced custom Desmos sidebar with Chrome native side panel',
-            'Added floating button on WeBWorK pages to open calculator panel',
-            'Side panel now includes both Desmos Scientific and Graphing calculators',
-            'Improved performance and integration with browser features',
-            'Removed old sidebar toggle from settings'
-        ],
-        '2.1.1': [
-            'Users can now disable automatically detected variables',
-            'Added collapsible "Disabled variables" section to re-enable disabled variables'
-        ],
-        '2.1': [
-            'Added toggle to enable/disable variable substitution feature',
-            'Variable substitution can now be turned off in extension settings',
-            'Fixed placeholder text to only show variable instructions when feature is enabled',
-            'Improved form submission handling for variable substitution'
-        ],
-        '2.0': [
-            'Added comprehensive onboarding page with instructions',
-            'Screenshot mode settings (copy to clipboard or download)',
-            'Added variable substitution and management',
-            'Desmos scientific calculator integration',
-            'Advanced variable management with custom variables'
-        ]
-        // Add future version updates here
-        // '1.1.0': ['New feature 1', 'New feature 2', ...],
-    };
-    
-    return updateNotes[version] || [
-        'Bug fixes and performance improvements'
-    ];
-}
-
-// Open settings button - removed since we now have inline toggles
-// document.getElementById('openSettings').addEventListener('click', () => {
-//     alert('Click the WeBWorKer extension icon in your browser toolbar to access all settings and toggles!');
-// });
-
-// Don't show again checkbox
-document.getElementById('dontShowAgain').addEventListener('click', (e) => {
-    e.preventDefault();
-    if (confirm('Are you sure you don\'t want to see this page on future updates? You can always access it from the extension popup.')) {
-        chrome.storage.local.set({ showOnboardingOnUpdate: false });
-        alert('Onboarding page disabled for updates. You can still access help from the extension menu.');
-        window.close();
-    }
-});
-
-// Add smooth scrolling for any anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
+            container.appendChild(item);
         }
+    } catch {
+        const status = document.getElementById('settings-status');
+        status.textContent = 'Settings could not load. Reopen this page to try again.';
+        status.dataset.state = 'error';
+    }
+}
+
+// Match the (), [] and {} nesting used by the answer-field checker.
+function analyzePreviewBrackets(expression) {
+    const closing = { '(': ')', '[': ']', '{': '}' };
+    const stack = [];
+    const tokens = [];
+    let error = '';
+    let count = 0;
+    for (let index = 0; index < expression.length; index++) {
+        const character = expression[index];
+        const token = { character, depth: 0, bracket: false, invalid: false };
+        tokens.push(token);
+        if (closing[character]) {
+            count++;
+            token.bracket = true;
+            token.depth = stack.length % 5;
+            stack.push({ token, index });
+        } else if (Object.values(closing).includes(character)) {
+            count++;
+            token.bracket = true;
+            const opening = stack[stack.length - 1];
+            if (opening && closing[opening.token.character] === character) {
+                token.depth = opening.token.depth;
+                stack.pop();
+            } else {
+                token.invalid = true;
+                if (!error) error = opening ?
+                    'Expected ' + closing[opening.token.character] + ', found ' + character + ' at character ' + (index + 1) + '.' :
+                    'Unexpected ' + character + ' at character ' + (index + 1) + '.';
+            }
+        }
+    }
+    for (const opening of stack) opening.token.invalid = true;
+    if (!error && stack.length) {
+        const opening = stack[stack.length - 1];
+        error = 'Missing ' + closing[opening.token.character] + ' for ' + opening.token.character + ' at character ' + (opening.index + 1) + '.';
+    }
+    return { tokens, state: error ? 'invalid' : count ? 'valid' : 'neutral', message: error || (count ? 'Brackets match' : 'No brackets to check') };
+}
+
+function updateBracketPreview(expression) {
+    const result = analyzePreviewBrackets(expression);
+    const output = document.getElementById('bracket-expression');
+    const status = document.getElementById('bracket-status');
+    output.replaceChildren();
+    for (const token of result.tokens) {
+        if (!token.bracket) {
+            output.appendChild(document.createTextNode(token.character));
+            continue;
+        }
+        const span = document.createElement('span');
+        span.textContent = token.character;
+        span.className = token.invalid ? 'bracket-error' : 'bracket-pair-' + token.depth;
+        output.appendChild(span);
+    }
+    status.textContent = result.message;
+    status.dataset.state = result.state;
+    document.getElementById('expression').dataset.brackets = result.state;
+}
+
+function updateMathPreview() {
+    const expression = document.getElementById('expression').value;
+    const output = document.getElementById('math-preview');
+    const hint = document.getElementById('preview-hint');
+    updateBracketPreview(expression);
+    for (const preset of document.querySelectorAll('[data-expression]')) {
+        preset.setAttribute('aria-pressed', String(preset.dataset.expression === expression));
+    }
+    if (!expression.trim()) {
+        output.replaceChildren();
+        hint.textContent = 'Type an expression above to preview it.';
+        delete hint.dataset.error;
+        return;
+    }
+    try {
+        katex.render(AMTparseMath(expression), output, { throwOnError: true, displayMode: true, maxExpand: 1000, trust: false });
+        hint.textContent = 'Edit the expression to see the preview change.';
+        delete hint.dataset.error;
+    } catch {
+        output.replaceChildren();
+        hint.textContent = 'This expression can’t be previewed yet. Check the syntax or try an example.';
+        hint.dataset.error = 'true';
+    }
+}
+
+document.getElementById('expression').addEventListener('input', updateMathPreview);
+document.querySelectorAll('[data-expression]').forEach(button => {
+    button.addEventListener('click', () => {
+        document.getElementById('expression').value = button.dataset.expression;
+        updateMathPreview();
     });
 });
 
-// Initialize the settings toggles
+async function loadPagePreferences() {
+    const checkbox = document.getElementById('showOnUpdates');
+    checkbox.disabled = true;
+    try {
+        const stored = await chrome.storage.local.get({ lastVersion: '', showOnboardingOnUpdate: false });
+        checkbox.checked = stored.showOnboardingOnUpdate === true;
+        checkbox.disabled = false;
+        checkbox.addEventListener('change', () => saveSettings({ showOnboardingOnUpdate: checkbox.checked }, 'local'));
+        const notes = {
+            '2.2.0': ['Desmos Scientific and Graphing now open in Chrome’s side panel. Use the calculator button beside your problem.'],
+            '2.1.1': ['You can disable individual detected variables and re-enable them from the variables panel.'],
+            '2.1': ['Variable substitution can be switched off in settings.'],
+            '2.0': ['Screenshot destinations and custom variables are available in settings.']
+        };
+        if (stored.lastVersion && stored.lastVersion !== manifest.version && notes[manifest.version]) {
+            document.getElementById('updateVersion').textContent = manifest.version;
+            for (const text of notes[manifest.version]) {
+                const li = document.createElement('li');
+                li.textContent = text;
+                document.getElementById('updateList').appendChild(li);
+            }
+            document.getElementById('updateNotice').hidden = false;
+        }
+        await chrome.storage.local.set({ lastVersion: manifest.version });
+    } catch {
+        checkbox.closest('label').title = 'Could not load this preference. Reopen the page to try again.';
+    }
+}
+
+AMTconfig.translateOnLoad = false;
+updateMathPreview();
 buildSettingsToggles();
+loadPagePreferences();
