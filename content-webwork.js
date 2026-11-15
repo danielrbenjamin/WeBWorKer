@@ -1286,7 +1286,7 @@ var webworkSetup = async function () {
         // Check if the feature is enabled
         var { customQueryEnabled, customQueryUrl, customQueryButtonText } = await chrome.storage.sync.get({ 
             customQueryEnabled: true, 
-            customQueryUrl: "https://chat.openai.com/?q=",
+            customQueryUrl: "https://www.google.com/search?q=",
             customQueryButtonText: "Custom Query"
         });
         if (!customQueryEnabled) return;
@@ -1336,6 +1336,10 @@ var webworkSetup = async function () {
         }
 
         function checkMatchingBrackets(expr) {
+            function escapeHtml(text) {
+                return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            }
             var tokenStack = [];
             var sexyText = "";
             var ct = 0;
@@ -1351,7 +1355,7 @@ var webworkSetup = async function () {
                 } else if (ch == ")" || ch == "]" || ch == "}") {
                     var head = tokenStack[tokenStack.length - 1];
                     if (!head) {
-                        return [false, i, sexyText + "<span class=ww_pairbad>" + expr.substring(i) + "</span>"];
+                        return [false, i, sexyText + "<span class=ww_pairbad>" + escapeHtml(expr.substring(i)) + "</span>"];
                     }
                     if ((head == "(" && ch == ")") || (head == "[" && ch == "]") || (head == "{" && ch == "}")) {
                         tokenStack.pop();
@@ -1362,13 +1366,7 @@ var webworkSetup = async function () {
                         return [false, lastUnclosedIndex, sexyText];
                     }
                 } else {
-                    if (ch == "<") {
-                        sexyText += "&lt;";
-                    } else if (ch == ">") {
-                        sexyText += "&gt;";
-                    } else {
-                        sexyText += ch;
-                    }
+                    sexyText += escapeHtml(ch);
                 }
             }
 
