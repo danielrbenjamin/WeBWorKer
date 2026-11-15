@@ -62,8 +62,8 @@ input[type="text"], select, textarea { max-width: 100%; border: 1px solid var(--
 .spoiler-guard-options select { padding: 5px 7px; font-size: 11px; }
 .spoiler-guard-options textarea { display: block; width: 100%; resize: vertical; margin-top: 6px; font: 10px/1.5 var(--mono); }
 .spoiler-guard-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 6px; }
-.spoiler-guard-actions button { border: 1px solid var(--border); border-radius: 3px; padding: 6px 10px; background: #fff; color: var(--text); font-size: 11px; }
-.spoiler-guard-actions button:hover { background: #e8ecf5; }
+.spoiler-guard-actions button { border: 1px solid var(--accent); border-radius: 3px; padding: 6px 10px; background: var(--accent); color: #fff; font-size: 11px; }
+.spoiler-guard-actions button:hover { background: #334da3; border-color: #334da3; }
 .spoiler-guard-actions button:disabled { opacity: .5; cursor: default; }
 .spoiler-guard-validation { color: #b42332; }
 .panel-section { background: var(--surface); }

@@ -1,31 +1,35 @@
-/* Floating button to open side panel */
+/* Floating entry point for the calculator sidebar. */
 .webworker-panel-button {
     position: fixed;
     right: 20px;
     bottom: 80px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    font-size: 28px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    z-index: 999999;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-    line-height: 1;
+    gap: 8px;
+    padding: 9px 12px;
+    border: 1px solid #243580;
+    border-radius: 4px;
+    background: #243580;
+    color: #fff;
+    font: 500 12px/1.4 'Segoe UI', system-ui, sans-serif;
+    cursor: pointer;
+    z-index: 999999;
 }
+.webworker-panel-button svg { width: 16px; height: 16px; flex-shrink: 0; }
+.webworker-panel-button:hover { background: #334da3; border-color: #334da3; }
+.webworker-panel-button:focus-visible { outline: 2px solid #243580; outline-offset: 3px; }
 
-.webworker-panel-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+/* Shared styling for WeBWorKer's question actions. */
+.btn.webworker-action-button {
+    border: 1px solid #243580;
+    border-radius: 3px;
+    background: #243580;
+    color: #fff;
+    box-shadow: none;
+    text-shadow: none;
+    font: 500 12px/1.4 'Segoe UI', system-ui, sans-serif;
+    padding: 9px 12px;
 }
-
-.webworker-panel-button:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
+.btn.webworker-action-button:hover { background: #334da3; border-color: #334da3; color: #fff; }
+.btn.webworker-action-button:focus-visible { outline: 2px solid #243580; outline-offset: 3px; }

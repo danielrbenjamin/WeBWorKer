@@ -460,9 +460,9 @@
 
     peekButton.disabled = siteDisabled();
     peekButton.setAttribute('aria-pressed', String(peeking));
-    peekButton.title = 'Temporarily reveal answers and feedback (Alt+Shift+P)';
+    peekButton.title = 'Temporarily reveal answers and feedback';
     siteButton.textContent = siteDisabled() ? 'Turn on study mode' : 'Turn off study mode';
-    siteButton.title = 'Turn study mode on or off for this site (Alt+Shift+H)';
+    siteButton.title = 'Turn study mode on or off for this site';
   }
 
   function togglePeek() {

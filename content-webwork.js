@@ -527,7 +527,7 @@ var webworkSetup = async function () {
                     enableBtn.textContent = 'Enable';
                     enableBtn.style.marginLeft = '4px';
                     enableBtn.style.border = '1px solid rgba(0,0,0,0.08)';
-                    enableBtn.style.background = '#10b981';
+                    enableBtn.style.background = '#243580';
                     enableBtn.style.color = '#fff';
                     enableBtn.style.padding = '2px 6px';
                     enableBtn.style.borderRadius = '3px';
@@ -611,7 +611,7 @@ var webworkSetup = async function () {
             addBtn.textContent = 'Add Variable';
             addBtn.style.padding = '4px 12px';
             addBtn.style.border = 'none';
-            addBtn.style.background = '#10b981';
+            addBtn.style.background = '#243580';
             addBtn.style.color = '#fff';
             addBtn.style.borderRadius = '4px';
             addBtn.style.cursor = 'pointer';
@@ -848,11 +848,9 @@ var webworkSetup = async function () {
             // Create "Clear Answers" button
             var clearAnswers = document.createElement("input");
             clearAnswers.id = "clearAnswersButton";
-            clearAnswers.className = "btn btn-primary mb-1";
+            clearAnswers.className = "btn btn-primary mb-1 webworker-action-button";
             clearAnswers.type = "submit";
             clearAnswers.value = "Clear Answers";
-            clearAnswers.style.backgroundColor = "#dd5555";
-            clearAnswers.style.backgroundImage = "none";
 
             clearAnswers.addEventListener("click", function (e) {
                 e.preventDefault();
@@ -893,11 +891,9 @@ var webworkSetup = async function () {
             // Create "Piazza Button" button
             var piazzaButton = document.createElement("input");
             piazzaButton.id = "piazzaButton";
-            piazzaButton.className = "btn btn-secondary mb-1"; // Adjust the class as needed
+            piazzaButton.className = "btn btn-secondary mb-1 webworker-action-button"; // Adjust the class as needed
             piazzaButton.type = "button";
             piazzaButton.value = "Open Piazza";
-            piazzaButton.style.backgroundColor = "#4e739d";
-            piazzaButton.style.backgroundImage = "none";
 
             // Add event listener to copy text from the div with id "problem_body" when clicked
             piazzaButton.addEventListener("click", function () {
@@ -936,11 +932,9 @@ var webworkSetup = async function () {
             // Create "Google Search Button" button
             var googleSearchButton = document.createElement("input");
             googleSearchButton.id = "googleSearchButton";
-            googleSearchButton.className = "btn btn-secondary mb-1"; // Adjust the class as needed
+            googleSearchButton.className = "btn btn-secondary mb-1 webworker-action-button"; // Adjust the class as needed
             googleSearchButton.type = "button";
             googleSearchButton.value = "Online Resources";
-            googleSearchButton.style.backgroundColor = "#731DD8";
-            googleSearchButton.style.backgroundImage = "none";
 
             // Add event listener to copy text from the div with id "problem_body" when clicked
             googleSearchButton.addEventListener("click", function () {
@@ -1222,11 +1216,9 @@ var webworkSetup = async function () {
         // Create the "Screenshot" button
         var screenshotButton = document.createElement("input");
         screenshotButton.id = "screenshotButton";
-        screenshotButton.className = "btn btn-secondary mb-1";
+        screenshotButton.className = "btn btn-secondary mb-1 webworker-action-button";
         screenshotButton.type = "button";
         screenshotButton.value = "Screenshot Question";
-        screenshotButton.style.backgroundColor = "#5a9";
-        screenshotButton.style.backgroundImage = "none";
     
         // Add event listener to take a screenshot of the question
         screenshotButton.addEventListener("click", async function () {
@@ -1296,11 +1288,9 @@ var webworkSetup = async function () {
             // Create "Custom Query" button
             var customQueryButton = document.createElement("input");
             customQueryButton.id = "customQueryButton";
-            customQueryButton.className = "btn btn-secondary mb-1";
+            customQueryButton.className = "btn btn-secondary mb-1 webworker-action-button";
             customQueryButton.type = "button";
             customQueryButton.value = customQueryButtonText;
-            customQueryButton.style.backgroundColor = "#10a37f";
-            customQueryButton.style.backgroundImage = "none";
 
             // Add event listener to open the custom URL with the question pre-filled
             customQueryButton.addEventListener("click", function () {
@@ -1721,7 +1711,7 @@ addConfirmationListener();
     // Create a new submit button element
     var duplicateSubmitButton = document.createElement("input");
     duplicateSubmitButton.id = 'weworker-extra-submit';
-    duplicateSubmitButton.className = "btn btn-primary";
+    duplicateSubmitButton.className = "btn btn-primary webworker-action-button";
     duplicateSubmitButton.type = "button";
     duplicateSubmitButton.value = "Submit Answers"; // You can change the button text as needed
 
@@ -1767,7 +1757,7 @@ function embedPDFViewerFromImage(imageElement) {
     openButton.style.display = "inline-block";
     openButton.style.marginTop = "8px";
     openButton.style.padding = "6px 12px";
-    openButton.style.backgroundColor = "#007bff";
+    openButton.style.backgroundColor = "#243580";
     openButton.style.color = "#fff";
     openButton.style.textDecoration = "none";
     openButton.style.borderRadius = "4px";
@@ -1936,11 +1926,9 @@ var createSettingsButton = function () {
         // Create "Settings" button
         var settingsButton = document.createElement("input");
         settingsButton.id = "settingsButton";
-        settingsButton.className = "btn btn-light btn-sm ms-2"; // Adjust the class as needed
+        settingsButton.className = "btn btn-light btn-sm ms-2 webworker-action-button"; // Adjust the class as needed
         settingsButton.type = "button";
         settingsButton.value = "WeBWorKer Settings";
-        settingsButton.style.backgroundColor = "#007bff";
-        settingsButton.style.backgroundImage = "none";
 
         // Add event listener to open extension options page
         settingsButton.addEventListener("click", function () {

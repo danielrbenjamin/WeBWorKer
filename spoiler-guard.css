@@ -210,24 +210,22 @@ html[data-wwh-mode="blur"][data-wwh-solutions="on"] :is(
   align-items: center;
   gap: 8px;
   padding: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 6px;
-  background: #fff;
-  color: #374151;
-  font: 13px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  border: 1px solid #d9dde6;
+  border-radius: 4px;
+  background: #f4f5f7;
+  color: #172344;
+  font: 500 12px/1.4 'Segoe UI', system-ui, sans-serif;
 }
 #wwh-panel button {
   appearance: none;
   padding: 6px 10px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 6px;
-  background: #f9fafb;
-  color: #374151;
+  border: 1px solid #243580;
+  border-radius: 3px;
+  background: #243580;
+  color: #fff;
   font: inherit;
   cursor: pointer;
 }
-#wwh-panel button:hover { background: #f3f4f6; }
-#wwh-panel button:focus-visible { outline: 2px solid #667eea; outline-offset: 2px; }
-#wwh-panel [data-action="peek"] { background: #667eea; border-color: #667eea; color: white; }
-#wwh-panel[data-state="revealed"] [data-action="peek"] { background: #764ba2; }
+#wwh-panel button:hover { background: #334da3; border-color: #334da3; }
+#wwh-panel button:focus-visible { outline: 2px solid #243580; outline-offset: 3px; }
+#wwh-panel button:disabled { opacity: .5; cursor: default; }

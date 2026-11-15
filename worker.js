@@ -23,19 +23,6 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     }
 });
 
-chrome.commands.onCommand.addListener(async (command) => {
-    const type = command === 'spoiler-guard-peek' ? 'wwh-peek' :
-        command === 'spoiler-guard-toggle-site' ? 'wwh-toggle-site' : null;
-    if (!type) return;
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (!tab || !tab.id) return;
-    try {
-        await chrome.tabs.sendMessage(tab.id, { type }, { frameId: 0 });
-    } catch (error) {
-        // Shortcuts do nothing on pages where study mode is not available.
-    }
-});
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (!message) {
         return;

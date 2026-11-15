@@ -44,17 +44,6 @@
       }
    ],
 
-   "commands": {
-      "spoiler-guard-peek": {
-         "suggested_key": { "default": "Alt+Shift+P" },
-         "description": "Peek at hidden answers and feedback"
-      },
-      "spoiler-guard-toggle-site": {
-         "suggested_key": { "default": "Alt+Shift+H" },
-         "description": "Turn study mode on or off for this site"
-      }
-   },
-
    "web_accessible_resources": [
       {
          "resources": [

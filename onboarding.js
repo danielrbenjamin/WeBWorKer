@@ -11,7 +11,7 @@ const settingCopy = {
     variableSubstitutionEnabled: ['Variable substitution', 'Use detected values and your own variables.'],
     screenshotButtonEnabled: ['Question screenshots', 'Copy or download the question as an image.'],
     customQueryEnabled: ['Custom search shortcut', 'Choose the service used for problem lookups.'],
-    sidePanelButtonEnabled: ['Calculator button', 'Show the floating button for the Desmos panel.']
+    sidePanelButtonEnabled: ['Calculator button', 'Show the floating button for calculator tools.']
 };
 
 let statusTimer;

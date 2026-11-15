@@ -1,0 +1,28 @@
+:root {
+    color-scheme: light;
+    --accent: #243580;
+    --text: #172344;
+    --muted: #566174;
+    --line: #d9dde6;
+    --surface: #f4f5f7;
+    font-family: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { display: flex; flex-direction: column; height: 100vh; margin: 0; background: #fff; color: var(--text); font-size: 13px; }
+[hidden] { display: none !important; }
+button, select, textarea { font: inherit; }
+button, select { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.panel-header { flex-shrink: 0; padding: 14px 16px; border-bottom: 1px solid var(--line); background: var(--surface); }
+.tool-picker { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 11px; }
+.tool-picker select { min-width: 0; flex: 1; padding: 7px 9px; border: 1px solid #c5cad5; border-radius: 3px; background: #fff; color: var(--text); font-size: 12px; }
+#toolStatus { margin: 9px 0 0; color: #b42332; font-size: 11px; }
+.tool-content { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.calculator-frame { display: block; width: 100%; height: 100%; border: 0; }
+.wolfram-tool { height: 100%; overflow: auto; padding: 24px 20px; }
+h2 { margin: 0 0 22px; font-size: 19px; font-weight: 500; letter-spacing: -.4px; }
+#wolframForm label { display: block; margin-bottom: 9px; color: var(--muted); font-size: 12px; }
+#wolframQuery { display: block; width: 100%; resize: vertical; min-height: 100px; padding: 10px 12px; border: 1px solid #c5cad5; border-radius: 3px; background: #fff; color: var(--text); font: 12px/1.6 'Cascadia Code', Consolas, monospace; }
+.submit-button { display: block; margin-top: 14px; padding: 9px 15px; border: 1px solid var(--accent); border-radius: 3px; background: var(--accent); color: #fff; font-size: 12px; }
+.submit-button:hover { background: #334da3; border-color: #334da3; }
+.wolfram-tool p { margin: 18px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }

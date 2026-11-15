@@ -36,9 +36,10 @@
       var button = document.createElement('button');
       button.id = 'webworker-panel-button';
       button.className = 'webworker-panel-button';
-      button.innerHTML = '🧮';
-      button.setAttribute('title', 'Open Desmos Calculator');
-      button.setAttribute('aria-label', 'Open Desmos Calculator Panel');
+      button.type = 'button';
+      button.innerHTML = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="4" y="2" width="12" height="16" rx="1.5"/><path d="M6.5 5.5h7M6.5 9h2m3 0h2m-7 3h2m3 0h2m-7 3h2m3 0h2"/></svg><span>Calculator</span>';
+      button.setAttribute('title', 'Open calculator tools');
+      button.setAttribute('aria-label', 'Open calculator tools sidebar');
 
       button.addEventListener('click', function(e) {
         e.preventDefault();

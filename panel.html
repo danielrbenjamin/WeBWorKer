@@ -1,87 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WeBWorKer Tools</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .header h1 {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .tool-selector {
-            background: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 13px;
-            color: #333;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        .tool-selector:hover {
-            background: rgba(255,255,255,0.95);
-        }
-
-        .tool-selector:focus {
-            box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
-        }
-
-        .iframe-container {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-        }
-
-        iframe {
-            border: none;
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-    </style>
-    <script src="panel.js"></script>
+    <meta name="color-scheme" content="light">
+    <title>WeBWorKer</title>
+    <link rel="stylesheet" href="panel.css">
+    <script src="panel.js" defer></script>
 </head>
-
 <body>
-    <div class="header">
-        <h1>🧮 Desmos Calculator</h1>
-        <select class="tool-selector" id="toolSelector">
-            <option value="https://www.desmos.com/scientific">Scientific</option>
-            <option value="https://www.desmos.com/calculator">Graphing</option>
-        </select>
-    </div>
-    <div class="iframe-container">
-        <iframe allow="clipboard-write" id="toolIframe"></iframe>
-    </div>
+    <header class="panel-header">
+        <label class="tool-picker" for="toolSelector"><span>Tools</span>
+            <select id="toolSelector" disabled>
+                <option value="https://www.desmos.com/scientific">Desmos Scientific</option>
+                <option value="https://www.desmos.com/calculator">Desmos Graphing</option>
+                <option value="https://www.wolframalpha.com/">Wolfram Alpha</option>
+            </select>
+        </label>
+        <p id="toolStatus" role="status" hidden></p>
+    </header>
+    <main class="tool-content">
+        <iframe class="calculator-frame" id="scientificFrame" title="Desmos Scientific calculator" allow="clipboard-write" hidden></iframe>
+        <iframe class="calculator-frame" id="graphingFrame" title="Desmos Graphing calculator" allow="clipboard-write" hidden></iframe>
+        <section id="wolframTool" class="wolfram-tool" aria-labelledby="wolfram-heading" hidden>
+            <h2 id="wolfram-heading">Wolfram Alpha</h2>
+            <form id="wolframForm">
+                <label for="wolframQuery">Enter an expression or question</label>
+                <textarea id="wolframQuery" rows="4" placeholder="integrate x^2 sin(x)" required></textarea>
+                <button type="submit" class="submit-button">Open results</button>
+            </form>
+            <p>Results open on Wolfram Alpha in a new tab.</p>
+        </section>
+    </main>
 </body>
-
 </html>

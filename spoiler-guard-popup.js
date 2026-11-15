@@ -117,9 +117,7 @@ function buildSpoilerGuardSettings(masterToggle) {
         updateEnabled();
     });
     actions.append(peek, pause);
-    const shortcuts = document.createElement('p');
-    shortcuts.textContent = 'Alt+Shift+P: Peek · Alt+Shift+H: study mode on/off for this site';
-    container.append(actions, status, shortcuts);
+    container.append(actions, status);
     fields.disabled = true;
     peek.disabled = pause.disabled = true;
     (async () => {
