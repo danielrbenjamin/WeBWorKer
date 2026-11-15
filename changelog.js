@@ -1,7 +1,7 @@
 // Keep newest entries first. Move Unreleased notes into a numbered entry when shipping.
 var WeBWorKerChangelog = [
     {
-        version: 'Unreleased',
+        version: '3.0.0',
         changes: [
             'Added optional Study Mode to hide previous answers, feedback, grades, and solutions.',
             'Added nested variable expressions, cycle detection, and safer expansion.',

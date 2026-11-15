@@ -26,7 +26,7 @@
         runtime: {
             onMessage: { addListener: listener => messages.push(listener) },
             sendMessage(message, callback) { callback?.({ ok: true }); },
-            getManifest: () => ({ version: '2.2.0' })
+            getManifest: () => ({ version: '3.0.0' })
         },
         tabs: {
             async query() { return [{ id: 1, url: location.origin + '/webwork2/test' }]; },
