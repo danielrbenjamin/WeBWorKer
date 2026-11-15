@@ -13,6 +13,14 @@ Available at https://chromewebstore.google.com/detail/webworker/cokogomdladilchd
 
 Should work with most implementations of WeBWorK, please create an issue on GitHub if you notice any errors.
 
+# Variable expressions
+
+Custom variables can contain numbers or expressions. For example, defining `b = -1` and `a = 2b` expands `a` to `(2*(-1))`. Unknown symbols remain symbolic, and multiplication is inserted where needed in nested definitions. Function names and scientific notation are preserved.
+
+Circular definitions are rejected. Expansion also stops with an error above 32 nested variables or 20,000 output characters. If expansion fails during submission, no answers are rewritten and the submission is stopped. Use explicit parentheses for complex function arguments.
+
+Run the expansion tests with `node --test tests/variable-substitution.test.cjs`.
+
 # Libraries
 
 This extension makes use of the following open source libraries:

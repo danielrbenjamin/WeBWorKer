@@ -1,5 +1,196 @@
 console.log("[WeBWorKer] content-webwork.js");
 
+// Text-only expansion: never evaluate student expressions as JavaScript.
+var WeBWorKerVariables = (function () {
+    var functions = new Set([
+        'sin', 'cos', 'tan', 'sec', 'csc', 'cot', 'asin', 'acos', 'atan', 'asec', 'acsc', 'acot',
+        'arcsin', 'arccos', 'arctan', 'sinh', 'cosh', 'tanh', 'sech', 'csch', 'coth',
+        'asinh', 'acosh', 'atanh', 'asech', 'acsch', 'acoth',
+        'log', 'ln', 'exp', 'sqrt', 'abs', 'floor', 'ceil', 'round', 'min', 'max', 'pow'
+    ]);
+    var numeric = /^(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?/;
+    var maxLength = 20000;
+    var maxDepth = 32;
+    var own = function (object, key) { return Object.prototype.hasOwnProperty.call(object, key); };
+    var token = function (type, text) { return { type: type, text: text }; };
+
+    function tokenize(expression, variables) {
+        if (expression.length > maxLength) throw new Error('Expression is too long to expand.');
+        var names = Object.keys(variables).sort(function (a, b) { return b.length - a.length; });
+        var functionNames = Array.from(functions).sort(function (a, b) { return b.length - a.length; });
+        var result = [];
+        for (var index = 0; index < expression.length;) {
+            var rest = expression.slice(index);
+            if (/^\s/.test(rest)) { index++; continue; }
+            var number = rest.match(numeric);
+            if (number) {
+                if (!Number.isFinite(Number(number[0]))) throw new Error('Numbers must be finite.');
+                result.push(token('number', number[0]));
+                index += number[0].length;
+                continue;
+            }
+            var identifier = rest.match(/^[A-Za-z]\w*/);
+            if (identifier) {
+                var numericFunction = !own(variables, identifier[0]) && functionNames.find(function (fn) {
+                    return rest.toLowerCase().startsWith(fn) && numeric.test(rest.slice(fn.length));
+                });
+                if (numericFunction) {
+                    var argumentNumber = rest.slice(numericFunction.length).match(numeric)[0];
+                    if (!Number.isFinite(Number(argumentNumber))) throw new Error('Numbers must be finite.');
+                    result.push(token('function', rest.slice(0, numericFunction.length)), token('number', argumentNumber));
+                    index += numericFunction.length + argumentNumber.length;
+                    continue;
+                }
+                var text = identifier[0];
+                index += text.length;
+                if (functions.has(text.toLowerCase())) {
+                    result.push(token('function', text));
+                    continue;
+                }
+                if (!own(variables, text)) {
+                    // Preserve unknown identifiers as a whole. Only split a run
+                    // when all of it consists of defined variable names.
+                    var parts = [], offset = 0;
+                    while (offset < text.length) {
+                        var name = names.find(function (candidate) { return text.startsWith(candidate, offset); });
+                        if (!name) break;
+                        parts.push(token('identifier', name));
+                        offset += name.length;
+                    }
+                    if (offset === text.length && parts.length > 1) {
+                        result.push.apply(result, parts);
+                        continue;
+                    }
+                    // Keep existing shorthand such as sin6, sinx and ln x,
+                    // without treating arbitrary words like 'sinewave' as calls.
+                    var shorthand = functionNames.find(function (fn) {
+                        if (!text.toLowerCase().startsWith(fn)) return false;
+                        var argument = text.slice(fn.length);
+                        return /^[A-Za-z]$/.test(argument) || own(variables, argument) || /^\d+$/.test(argument);
+                    });
+                    if (shorthand) {
+                        var argument = text.slice(shorthand.length);
+                        result.push(token('function', text.slice(0, shorthand.length)));
+                        result.push(token(/^\d+$/.test(argument) ? 'number' : 'identifier', argument));
+                        continue;
+                    }
+                }
+                result.push(token('identifier', text));
+                continue;
+            }
+            var character = rest[0];
+            if (!/[+\-*/^%(),]/.test(character)) throw new Error('Expression contains invalid characters.');
+            result.push(token('symbol', character));
+            index++;
+        }
+        return result;
+    }
+
+    function normalize(tokens) {
+        var calls = [];
+        for (var index = 0; index < tokens.length; index++) {
+            var current = tokens[index];
+            calls.push(current);
+            if (current.type !== 'function' || tokens[index + 1]?.text === '(') continue;
+            calls.push(token('symbol', '('));
+            while (tokens[index + 1] && /^[+-]$/.test(tokens[index + 1].text)) calls.push(tokens[++index]);
+            var argument = tokens[++index];
+            if (!argument || !['number', 'identifier'].includes(argument.type)) {
+                throw new Error('Use parentheses around function arguments.');
+            }
+            calls.push(argument, token('symbol', ')'));
+        }
+        var result = [];
+        for (var item of calls) {
+            var previous = result[result.length - 1];
+            var endsOperand = previous && (['number', 'identifier'].includes(previous.type) || previous.text === ')');
+            var startsOperand = ['number', 'identifier', 'function'].includes(item.type) || item.text === '(';
+            if (endsOperand && startsOperand) {
+                if (previous.type === 'number' && item.type === 'number') throw new Error('Separate numbers with an operator.');
+                result.push(token('symbol', '*'));
+            }
+            result.push(item);
+        }
+        return result;
+    }
+
+    function validate(tokens) {
+        var stack = [], needsOperand = true;
+        for (var index = 0; index < tokens.length; index++) {
+            var item = tokens[index];
+            if (item.type === 'function') {
+                if (!needsOperand || tokens[index + 1]?.text !== '(') throw new Error('Invalid function expression.');
+            } else if (['number', 'identifier'].includes(item.type)) {
+                if (!needsOperand) throw new Error('Missing operator in expression.');
+                needsOperand = false;
+            } else if (item.text === '(') {
+                stack.push(tokens[index - 1]?.type === 'function');
+                needsOperand = true;
+            } else if (item.text === ')') {
+                if (!stack.length || needsOperand) throw new Error('Check the parentheses in your expression.');
+                stack.pop();
+                needsOperand = false;
+            } else if (item.text === ',') {
+                if (needsOperand || !stack[stack.length - 1]) throw new Error('Commas must separate function arguments.');
+                needsOperand = true;
+            } else {
+                if (needsOperand && !/^[+-]$/.test(item.text)) throw new Error('Missing value next to an operator.');
+                needsOperand = true;
+            }
+        }
+        if (stack.length || needsOperand) throw new Error('Expression is incomplete. Check its operators and parentheses.');
+    }
+
+    function expand(expression, variables) {
+        variables = variables || {};
+        if (!String(expression).trim()) return '';
+        var resolved = new Map();
+        function visit(text, path) {
+            var output = [];
+            for (var item of normalize(tokenize(String(text), variables))) {
+                if (item.type !== 'identifier' || !own(variables, item.text)) {
+                    output.push(item);
+                } else {
+                    var name = item.text;
+                    if (path.includes(name)) throw new Error('Circular variable definition: ' + path.concat(name).join(' → '));
+                    if (path.length >= maxDepth) throw new Error('Variable definitions are nested too deeply (maximum ' + maxDepth + ').');
+                    if (!resolved.has(name)) {
+                        var value = variables[name];
+                        if ((typeof value !== 'string' && typeof value !== 'number') ||
+                            (typeof value === 'number' && !Number.isFinite(value)) || !String(value).trim()) {
+                            throw new Error('Variable ' + name + ' must contain a number or expression.');
+                        }
+                        resolved.set(name, visit(String(value), path.concat(name)));
+                    }
+                    output.push(token('symbol', '('));
+                    output.push.apply(output, resolved.get(name));
+                    output.push(token('symbol', ')'));
+                }
+                if (output.length > maxLength) throw new Error('Expanded expression is too long. Simplify your variable definitions.');
+            }
+            output = normalize(output);
+            validate(output);
+            if (output.map(function (item) { return item.text; }).join('').length > maxLength) {
+                throw new Error('Expanded expression is too long. Simplify your variable definitions.');
+            }
+            return output;
+        }
+        return visit(expression, []).map(function (item) { return item.text; }).join('');
+    }
+
+    function prepareValue(name, text, variables) {
+        if (!/^[A-Za-z]\w*$/.test(name)) throw new Error('Variable names must start with a letter and contain only letters, numbers, and underscores.');
+        if (functions.has(name.toLowerCase())) throw new Error('Choose a variable name that is not a math function.');
+        text = text.trim();
+        if (!text) throw new Error('Please enter a value or expression.');
+        var candidate = Object.assign({}, variables);
+        candidate[name] = text;
+        expand(name, candidate);
+        return /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(text) ? Number(text) : text;
+    }
+    return { expand: expand, prepareValue: prepareValue };
+})();
+
 var webworkSetup = async function () {
     var MATH_FONT = {
         "size": "1.21em",
@@ -169,7 +360,7 @@ var webworkSetup = async function () {
                 name.textContent = k;
                 name.style.border = '1px solid rgba(0,0,0,0.08)';
                 // Distinguish custom variables with a different background color
-                var isCustom = customVariables.hasOwnProperty(k);
+                var isCustom = Object.prototype.hasOwnProperty.call(customVariables, k);
                 name.style.background = isCustom ? '#e0f2fe' : '#f3f4f6';
                 name.style.padding = '4px 6px';
                 name.style.borderRadius = '4px';
@@ -409,7 +600,7 @@ var webworkSetup = async function () {
 
             var valueInput = document.createElement('input');
             valueInput.type = 'text';
-            valueInput.placeholder = 'value (e.g., 5)';
+            valueInput.placeholder = 'value or expression';
             valueInput.style.width = '100px';
             valueInput.style.padding = '4px 6px';
             valueInput.style.border = '1px solid rgba(0,0,0,0.2)';
@@ -445,13 +636,12 @@ var webworkSetup = async function () {
                     return;
                 }
                 
-                var value = Number(valueStr);
-                if (isNaN(value)) {
-                    alert('Value must be a valid number');
+                try {
+                    customVariables[name] = WeBWorKerVariables.prepareValue(name, valueStr, getAllVariables());
+                } catch (error) {
+                    alert(error.message);
                     return;
                 }
-                
-                customVariables[name] = value;
                 saveCustomVariables();  // Save after adding
                 nameInput.value = '';
                 valueInput.value = '';
@@ -499,14 +689,14 @@ var webworkSetup = async function () {
 
     // Function to apply variable substitution to all inputs
     var applyVariablesToAllInputs = function() {
-        console.log('[WeBWorKer] Applying variables to all inputs before submit');
-        inputSubstitutionFunctions.forEach(function(fn) {
-            try {
-                fn();
-            } catch (e) {
-                console.error('[WeBWorKer] Error applying variables to input', e);
-            }
-        });
+        var pending = [];
+        for (var prepare of inputSubstitutionFunctions) {
+            var commit = prepare(true);
+            if (commit === false) return false;
+            if (typeof commit === 'function') pending.push(commit);
+        }
+        pending.forEach(function (commit) { commit(); });
+        return true;
     };
 
     var applyToInputs = function () {
@@ -579,109 +769,33 @@ var webworkSetup = async function () {
                         // Use IIFE to capture the current input in closure
                         (function(currentInput) {
                         // Function to evaluate expression by substituting parsed variables
-                        var applyVariableSubstitution = function () {
+                        var applyVariableSubstitution = function (prepareOnly) {
                             var expr = currentInput.value || '';
                             var vars = getAllVariables();
                             if (!expr) {
                                 return;
                             }
 
-                            // Built-in function names to ignore in variable segmentation and unknown-identifier checks
-                            var allowedFunctions = [
-                                // Trig
-                                'sin','cos','tan','sec','csc','cot',
-                                'asin','acos','atan','asec','acsc','acot',
-                                'arcsin','arccos','arctan',
-                                // Hyperbolic
-                                'sinh','cosh','tanh','sech','csch','coth',
-                                'asinh','acosh','atanh','asech','acsch','acoth',
-                                // Misc math
-                                'log','ln','exp','sqrt','abs','floor','ceil','round','min','max','pow'
-                            ];
-                            var fnSet = new Set(allowedFunctions);
-
-                            // Pre-process expression to insert explicit multiplication where users type concatenated variables
-                            // Support multi-letter variables by greedily segmenting letter runs into known variable names.
                             try {
-                                var names = Object.keys(vars).sort(function(a,b){return b.length - a.length;});
-
-                                // Replace contiguous identifier runs with segmentation based on known variable names.
-                                expr = expr.replace(/([A-Za-z]\w*)/g, function(match) {
-                                    var i = 0;
-                                    var parts = [];
-                                    // If the whole token is a known function, leave it untouched
-                                    if (fnSet.has(match.toLowerCase())) return match;
-                                    while (i < match.length) {
-                                        var found = false;
-                                        for (var vi = 0; vi < names.length; vi++) {
-                                            var nm = names[vi];
-                                            if (match.substr(i, nm.length) === nm) {
-                                                parts.push(nm);
-                                                i += nm.length;
-                                                found = true;
-                                                break;
-                                            }
-                                        }
-                                        if (!found) {
-                                        // cannot segment this run using known vars -> leave original run
-                                        return match;
-                                    }
-                                }
-                                return parts.join('*');
-                            });
-
-                            // insert * between number and identifier: 2A -> 2*A
-                            expr = expr.replace(/(\d(?:\.\d+)?)(?=\s*[A-Za-z]\w*)/g, '$1*');
-                            // insert * between identifier and open paren: A( -> A*(, but NOT for known functions like sin(
-                            expr = expr.replace(/([A-Za-z]\w*)(\s*\()/g, function(_, name, paren){
-                                return fnSet.has(name.toLowerCase()) ? (name + paren) : (name + '*' + paren);
-                            });
-
-                            // Support function application without parentheses, e.g., sin6 -> sin(6), ln x -> ln(x)
-                            var fnAlt = Array.from(fnSet).sort(function(a,b){return b.length - a.length;}).join('|');
-                            // Function followed by a number literal (no parens already)
-                            expr = expr.replace(new RegExp('\\b(' + fnAlt + ')(?!\\s*\\()\\s*([+-]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][+-]?\\d+)?)\\b','gi'), function(_m, fn, num){
-                                return fn + '(' + num + ')';
-                            });
-                            // Function followed by an identifier (variable) without parens: sinx -> sin(x), also allow space: sin x
-                            expr = expr.replace(new RegExp('\\b(' + fnAlt + ')(?!\\s*\\()\\s*([A-Za-z]\\w*)\\b','gi'), function(_m, fn, id){
-                                // Don't wrap if the id itself is a known function (rare but safe check)
-                                if (fnSet.has(id.toLowerCase())) return _m;
-                                return fn + '(' + id + ')';
-                            });
-                        } catch (e) {
-                            console.error('[WeBWorKer] error normalizing multiplication in expression', e);
-                        }
-
-                        // Sort var names by length desc to avoid partial replacements
-                        var names = Object.keys(vars).sort(function(a,b){return b.length - a.length;});
-                        for (var vi = 0; vi < names.length; vi++) {
-                            var nm = names[vi];
-                            // Replace identifiers with parenthesized numeric value
-                            // Use word boundaries to avoid replacing inside other names
-                            var esc = nm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                            var reVar = new RegExp('\\b' + esc + '\\b', 'g');
-                            expr = expr.replace(reVar, '(' + String(vars[nm]) + ')');
-                        }
-
-                        // Allow unknown identifiers to pass through; we only sanitize characters below
-
-                        // Allow only a safe set of characters (operators, digits, parentheses, commas, letters for known funcs, whitespace, decimal and exponent notation, and caret ^)
-                        if (!/^[0-9A-Za-z+\-*/^()., _%eE]+$/.test(expr)) {
-                            alert('Expression contains invalid characters.');
-                            return;
-                        }
-
-                        // Trim and set the substituted expression directly into the answer input
-                        expr = expr.trim();
-                        currentInput.value = expr;
-                        try {
-                            if (MathView && MathView.updateMath && currentInput.hasAttribute(MathView.MV_ATTR_ATTACHED)) {
-                                MathView.updateMath(currentInput.getAttribute(MathView.MV_ATTR_ATTACHED), currentInput.value);
+                                expr = WeBWorKerVariables.expand(expr, vars);
+                            } catch (error) {
+                                alert(error.message);
+                                return false;
                             }
-                        } catch (e) {
-                            // ignore math view update failures
-                        }
+
+                            var commit = function () {
+                                currentInput.value = expr;
+                                try {
+                                    if (MathView && MathView.updateMath && currentInput.hasAttribute(MathView.MV_ATTR_ATTACHED)) {
+                                        MathView.updateMath(currentInput.getAttribute(MathView.MV_ATTR_ATTACHED), currentInput.value);
+                                    }
+                                } catch (error) {
+                                    // A preview failure must not change substitution results.
+                                }
+                            };
+                            if (prepareOnly) return commit;
+                            commit();
+                            return true;
                     };
 
                         // Store this function for later use on submit
@@ -1409,8 +1523,9 @@ var webworkSetup = async function () {
                             if (variableSubstitutionEnabled) {
                                 try {
                                     console.log('[WeBWorKer] Form submitting, applying variables to all inputs');
-                                    applyVariablesToAllInputs();
+                                    if (!applyVariablesToAllInputs()) event.preventDefault();
                                 } catch (e) {
+                                    event.preventDefault();
                                     console.error('[WeBWorKer] Error while applying variables on submit', e);
                                 }
                             }
