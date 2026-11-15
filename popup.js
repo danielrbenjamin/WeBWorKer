@@ -57,8 +57,10 @@ var buildFeatureToggles = function () {
     if (ExtConfig.toggleDefinitions.length > 0) {
         var section = document.createElement('div');
         section.className = 'settings-section';
-        section.style.borderTop = '1px solid rgba(0,0,0,0.08)';
-        section.style.paddingTop = '12px';
+        var heading = document.createElement('h2');
+        heading.className = 'section-label';
+        heading.textContent = 'Tools';
+        section.appendChild(heading);
 
         ExtConfig.toggleDefinitions.forEach(def => {
             var wrapper = document.createElement('div');
@@ -67,9 +69,17 @@ var buildFeatureToggles = function () {
             var info = document.createElement('div');
             info.className = 'setting-info';
 
-            var textSpan = document.createElement('span');
+            var textSpan = document.createElement('label');
+            textSpan.htmlFor = def.id;
             textSpan.className = 'setting-label';
-            textSpan.textContent = def.label;
+            var labels = {
+                spoilerGuardEnabled: 'Study mode', clearAnswersEnabled: 'Clear answers button',
+                piazzaEnabled: 'Piazza shortcut', resourcesEnabled: 'Online resources',
+                checkParenthesesEnabled: 'Parentheses checker', variableSubstitutionEnabled: 'Variable substitution',
+                screenshotButtonEnabled: 'Question screenshots', customQueryEnabled: 'Custom search shortcut',
+                sidePanelButtonEnabled: 'Calculator button'
+            };
+            textSpan.textContent = labels[def.storageKey] || def.label;
 
             info.appendChild(textSpan);
 
@@ -79,9 +89,11 @@ var buildFeatureToggles = function () {
             var input = document.createElement('input');
             input.type = 'checkbox';
             input.id = def.id;
+            input.setAttribute('aria-label', textSpan.textContent);
 
             var spanSlider = document.createElement('span');
             spanSlider.className = 'slider round';
+            spanSlider.setAttribute('aria-hidden', 'true');
 
             label.appendChild(input);
             label.appendChild(spanSlider);
@@ -92,6 +104,7 @@ var buildFeatureToggles = function () {
             if (def.storageKey === 'spoilerGuardEnabled') {
                 wrapper.classList.add('spoiler-guard-setting');
                 var toggleRow = document.createElement('div');
+                toggleRow.className = 'setting-toggle-row';
                 toggleRow.className = 'spoiler-guard-toggle-row';
                 toggleRow.append(info, label);
                 wrapper.append(toggleRow, buildSpoilerGuardSettings(input));
@@ -100,16 +113,12 @@ var buildFeatureToggles = function () {
 
             // Add screenshot settings if this is the screenshot button toggle
             if (def.storageKey === 'screenshotButtonEnabled') {
+                wrapper.classList.add('setting-item-with-options');
                 // Modify wrapper to be a column layout
-                wrapper.style.flexDirection = 'column';
-                wrapper.style.alignItems = 'stretch';
 
                 // Create a row for the toggle (label and switch)
                 var toggleRow = document.createElement('div');
-                toggleRow.style.display = 'flex';
-                toggleRow.style.alignItems = 'center';
-                toggleRow.style.justifyContent = 'space-between';
-                toggleRow.style.width = '100%';
+                toggleRow.className = 'setting-toggle-row';
 
                 // Move info and label into toggleRow
                 wrapper.removeChild(info);
@@ -119,59 +128,43 @@ var buildFeatureToggles = function () {
                 wrapper.appendChild(toggleRow);
 
                 var screenshotSettings = document.createElement('div');
-                screenshotSettings.style.marginTop = '12px';
-                screenshotSettings.style.width = '100%';
+                screenshotSettings.className = 'inline-options';
 
                 // Mode label
                 var modeLabel = document.createElement('div');
-                modeLabel.textContent = 'Screenshot Mode:';
-                modeLabel.style.fontSize = '12px';
-                modeLabel.style.marginBottom = '6px';
-                modeLabel.style.color = '#666';
-                modeLabel.style.fontWeight = '600';
+                modeLabel.textContent = 'Screenshot destination';
+                modeLabel.className = 'option-label';
 
                 // Radio buttons container
                 var radioContainer = document.createElement('div');
-                radioContainer.style.display = 'flex';
-                radioContainer.style.flexDirection = 'column';
-                radioContainer.style.gap = '8px';
+                radioContainer.className = 'screenshot-choices';
 
                 // Download option
                 var downloadOption = document.createElement('label');
-                downloadOption.style.display = 'flex';
-                downloadOption.style.alignItems = 'center';
-                downloadOption.style.cursor = 'pointer';
-                downloadOption.style.fontSize = '13px';
 
                 var downloadRadio = document.createElement('input');
                 downloadRadio.type = 'radio';
                 downloadRadio.name = 'screenshotMode';
                 downloadRadio.value = 'download';
                 downloadRadio.id = 'screenshotModeDownload';
-                downloadRadio.style.marginRight = '8px';
 
                 var downloadText = document.createElement('span');
-                downloadText.textContent = 'Download screenshot';
+                downloadText.textContent = 'Download';
 
                 downloadOption.appendChild(downloadRadio);
                 downloadOption.appendChild(downloadText);
 
                 // Copy option
                 var copyOption = document.createElement('label');
-                copyOption.style.display = 'flex';
-                copyOption.style.alignItems = 'center';
-                copyOption.style.cursor = 'pointer';
-                copyOption.style.fontSize = '13px';
 
                 var copyRadio = document.createElement('input');
                 copyRadio.type = 'radio';
                 copyRadio.name = 'screenshotMode';
                 copyRadio.value = 'copy';
                 copyRadio.id = 'screenshotModeCopy';
-                copyRadio.style.marginRight = '8px';
 
                 var copyText = document.createElement('span');
-                copyText.textContent = 'Copy to clipboard';
+                copyText.textContent = 'Clipboard';
 
                 copyOption.appendChild(copyRadio);
                 copyOption.appendChild(copyText);
@@ -207,16 +200,12 @@ var buildFeatureToggles = function () {
 
             // Add custom query settings if this is the custom query toggle
             if (def.storageKey === 'customQueryEnabled') {
+                wrapper.classList.add('setting-item-with-options');
                 // Modify wrapper to be a column layout
-                wrapper.style.flexDirection = 'column';
-                wrapper.style.alignItems = 'stretch';
 
                 // Create a row for the toggle (label and switch)
                 var toggleRow = document.createElement('div');
-                toggleRow.style.display = 'flex';
-                toggleRow.style.alignItems = 'center';
-                toggleRow.style.justifyContent = 'space-between';
-                toggleRow.style.width = '100%';
+                toggleRow.className = 'setting-toggle-row';
 
                 // Move info and label into toggleRow
                 wrapper.removeChild(info);
@@ -226,45 +215,27 @@ var buildFeatureToggles = function () {
                 wrapper.appendChild(toggleRow);
 
                 var customQuerySettings = document.createElement('div');
-                customQuerySettings.style.marginTop = '12px';
-                customQuerySettings.style.width = '100%';
+                customQuerySettings.className = 'inline-options';
 
                 // URL input
-                var urlLabel = document.createElement('div');
-                urlLabel.textContent = 'Custom Query URL:';
-                urlLabel.style.fontSize = '12px';
-                urlLabel.style.marginBottom = '4px';
-                urlLabel.style.color = '#666';
+                var urlLabel = document.createElement('label');
+                urlLabel.htmlFor = 'customQueryUrl';
+                urlLabel.textContent = 'Search URL';
 
                 var urlInput = document.createElement('input');
                 urlInput.type = 'text';
                 urlInput.id = 'customQueryUrl';
                 urlInput.placeholder = 'https://www.google.com/search?q=';
-                urlInput.style.width = '100%';
-                urlInput.style.padding = '6px';
-                urlInput.style.border = '1px solid rgba(0,0,0,0.2)';
-                urlInput.style.borderRadius = '4px';
-                urlInput.style.fontSize = '12px';
-                urlInput.style.marginBottom = '8px';
-                urlInput.style.boxSizing = 'border-box';
 
                 // Button text input
-                var buttonTextLabel = document.createElement('div');
-                buttonTextLabel.textContent = 'Button Text:';
-                buttonTextLabel.style.fontSize = '12px';
-                buttonTextLabel.style.marginBottom = '4px';
-                buttonTextLabel.style.color = '#666';
+                var buttonTextLabel = document.createElement('label');
+                buttonTextLabel.htmlFor = 'customQueryButtonText';
+                buttonTextLabel.textContent = 'Button text';
 
                 var buttonTextInput = document.createElement('input');
                 buttonTextInput.type = 'text';
                 buttonTextInput.id = 'customQueryButtonText';
                 buttonTextInput.placeholder = 'Custom Query';
-                buttonTextInput.style.width = '100%';
-                buttonTextInput.style.padding = '6px';
-                buttonTextInput.style.border = '1px solid rgba(0,0,0,0.2)';
-                buttonTextInput.style.borderRadius = '4px';
-                buttonTextInput.style.fontSize = '12px';
-                buttonTextInput.style.boxSizing = 'border-box';
 
                 // Load saved values
                 chrome.storage.sync.get({
@@ -311,7 +282,6 @@ var buildFeatureToggles = function () {
         featureTogglesContainer.appendChild(section);
     }
 };
-
 
 buttonThisSite.addEventListener("click", async () => {
     var [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>WeBWorKer</title>
     <link rel="stylesheet" href="popup.css"/>
     <script src="ext-config.js"></script>
     <script src="spoiler-guard-config.js"></script>
@@ -9,16 +13,17 @@
 <body>
     <div id="popup-container">
         <div class="header">
-            <img src="icon/icon128.png" alt="Extension Icon"/>
+            <img src="icon/icon48.png" width="32" height="32" alt=""/>
             <div class="header-text">
                 <h1>WeBWorKer</h1>
-                <h2>by Daniel Benjamin</h2>
+                <a href="https://www.danielrbenjamin.com/" target="_blank" rel="noopener noreferrer">Daniel Benjamin</a>
             </div>
         </div>
         <div class="settings-section">
+            <h2 class="section-label">Enable WeBWorKer</h2>
             <div class="setting-item">
                 <div class="setting-info">
-                    <span class="setting-label">Enable On This Site</span>
+                    <label class="setting-label" for="enableThisSite">On this site</label>
                 </div>
                 <label class="switch">
                     <input id="enableThisSite" type="checkbox">
@@ -27,7 +32,7 @@
             </div>
             <div class="setting-item">
                 <div class="setting-info">
-                    <span class="setting-label">Enable Globally</span>
+                    <label class="setting-label" for="enableGlobal">On all WeBWorK sites</label>
                 </div>
                 <label class="switch">
                     <input id="enableGlobal" type="checkbox">
@@ -37,15 +42,15 @@
         </div>
         <!-- Feature toggles are rendered dynamically by popup.js using ExtConfig.toggleDefinitions -->
         <div id="featureToggles"></div>
-        <div class="settings-section" style="border-top: 1px solid rgba(0,0,0,0.08); padding-top: 12px;">
+        <div class="settings-section panel-section">
             <button id="openSidePanel" class="side-panel-button">
-                Open Math Tools Panel
+                Open calculator
             </button>
         </div>
         <div class="footer-links">
-            <a id="refreshPage" href="#" class="footer-link">Refresh to See Changes</a>
-            <a id="openOnboarding" href="#" class="footer-link">Help & Getting Started</a>
-            <a href="https://www.buymeacoffee.com/danielrbenjamin" target="_blank" class="footer-link donate-link">Support This Extension</a>
+            <a id="refreshPage" href="#" class="footer-link">Refresh page</a>
+            <a id="openOnboarding" href="#" class="footer-link">Help & settings</a>
+            <a href="https://www.buymeacoffee.com/danielrbenjamin" target="_blank" rel="noopener noreferrer" class="footer-link">Support</a>
         </div>
     </div>
     <script src="popup.js"></script>
