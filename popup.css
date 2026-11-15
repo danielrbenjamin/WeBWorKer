@@ -53,11 +53,11 @@ input[type="text"], select, textarea { max-width: 100%; border: 1px solid var(--
 .spoiler-guard-options { margin-top: 7px; color: var(--muted); font-size: 11px; }
 .spoiler-guard-options p { margin: 5px 0; line-height: 1.5; }
 .spoiler-guard-options summary { padding: 7px 0; color: var(--accent); font-size: 11px; }
-.spoiler-guard-options fieldset { min-width: 0; margin: 5px 0 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 3px; background: var(--surface); }
+.spoiler-guard-options fieldset { display: flow-root; min-width: 0; width: 100%; margin: 5px 0 0; padding: 12px; border: 1px solid var(--line); border-radius: 3px; background: var(--surface); }
 .spoiler-guard-options fieldset:disabled { opacity: .55; }
-.spoiler-guard-options legend { padding: 0 5px; color: var(--text); font-weight: 500; }
-.spoiler-guard-option { display: flex; align-items: center; gap: 8px; padding: 5px 0; color: var(--text); cursor: pointer; }
-.spoiler-guard-option input { margin: 0; }
+.spoiler-guard-options legend { float: left; width: 100%; padding: 0; margin: 0 0 7px; color: var(--text); font-weight: 500; }
+.spoiler-guard-option { clear: both; display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; color: var(--text); cursor: pointer; }
+.spoiler-guard-option input { flex-shrink: 0; margin: 2px 0 0; }
 .spoiler-guard-mode { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 10px 0 3px; }
 .spoiler-guard-options select { padding: 5px 7px; font-size: 11px; }
 .spoiler-guard-options textarea { display: block; width: 100%; resize: vertical; margin-top: 6px; font: 10px/1.5 var(--mono); }
@@ -69,6 +69,8 @@ input[type="text"], select, textarea { max-width: 100%; border: 1px solid var(--
 .panel-section { background: var(--surface); }
 .side-panel-button { display: block; width: 100%; padding: 10px 14px; border: 1px solid var(--accent); border-radius: 3px; background: var(--accent); color: #fff; font-size: 12px; font-weight: 500; cursor: pointer; }
 .side-panel-button:hover { background: #334da3; border-color: #334da3; }
+.refresh-page-button { display: block; width: 100%; margin-top: 10px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 3px; background: #fff; color: var(--accent); text-align: center; font-size: 12px; font-weight: 500; }
+.refresh-page-button:hover { background: #e8ecf5; text-decoration: none; }
 .footer-links { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 13px 20px; }
 .footer-link { font-size: 10px; color: var(--muted); }
 @media (prefers-reduced-motion: reduce) { *, *::before { transition: none !important; } }
