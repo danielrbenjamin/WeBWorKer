@@ -71,6 +71,7 @@ input[type="text"], select, textarea { max-width: 100%; border: 1px solid var(--
 .side-panel-button:hover { background: #334da3; border-color: #334da3; }
 .refresh-page-button { display: block; width: 100%; margin-top: 10px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 3px; background: #fff; color: var(--accent); text-align: center; font-size: 12px; font-weight: 500; }
 .refresh-page-button:hover { background: #e8ecf5; text-decoration: none; }
-.footer-links { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 13px 20px; }
-.footer-link { font-size: 10px; color: var(--muted); }
+.footer-links { padding: 12px 20px; }
+.help-button { display: block; width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 3px; background: #fff; color: var(--accent); font-size: 12px; font-weight: 500; cursor: pointer; }
+.help-button:hover { background: #e8ecf5; border-color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { *, *::before { transition: none !important; } }
