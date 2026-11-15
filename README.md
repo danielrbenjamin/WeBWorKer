@@ -5,72 +5,69 @@
 
 # WeBWorKer
 
-A Chrome extension to provide a real-time preview of math entered into WeBWorK text fields, and show whether parentheses are correctly completed, with minimal distraction in the form of extra input boxes or misaligned overlays.
+A Chrome extension that adds math previews and other tools to WeBWorK.
 
-Available at https://chromewebstore.google.com/detail/webworker/cokogomdladilchdakkknehhnnoipbke
+[Chrome Web Store](https://chromewebstore.google.com/detail/webworker/cokogomdladilchdakkknehhnnoipbke) · [Daniel Benjamin](https://www.danielrbenjamin.com/)
 
-<img src="https://raw.githubusercontent.com/alrra/browser-logos/90fdf03c/src/chrome/chrome.svg" width="48" alt="Chrome" valign="middle"> [<img valign="middle" src="https://img.shields.io/chrome-web-store/v/cokogomdladilchdakkknehhnnoipbke.svg">][link-cws] [<img valign="middle" src="https://img.shields.io/chrome-web-store/users/cokogomdladilchdakkknehhnnoipbke.svg">][link-cws]
+<img src="https://raw.githubusercontent.com/alrra/browser-logos/90fdf03c/src/chrome/chrome.svg" width="48" alt="Chrome" valign="middle"> [<img valign="middle" src="https://img.shields.io/chrome-web-store/v/cokogomdladilchdakkknehhnnoipbke.svg" alt="Chrome Web Store version">][link-cws] [<img valign="middle" src="https://img.shields.io/chrome-web-store/users/cokogomdladilchdakkknehhnnoipbke.svg" alt="Chrome Web Store users">][link-cws]
 
-Should work with most implementations of WeBWorK, please create an issue on GitHub if you notice any errors.
+## Features
 
-# Variable expressions
+- **Math previews:** See expressions rendered as you type, check matching parentheses and brackets, and resize answer fields.
+- **Variables:** Use values detected in the problem or define your own numbers and expressions. Press **Ctrl+Enter** to substitute them. Nested definitions are supported; circular definitions are rejected.
+- **Calculator sidebar:** Switch between Desmos Scientific, Desmos Graphing, and a Wolfram Alpha query form. Desmos work stays loaded while you switch tools in the open sidebar. Wolfram Alpha results open in a new tab.
+- **Question screenshots:** Copy or download an image of the question, including questions longer than the viewport.
+- **Study mode:** Optionally hide previous answers, feedback, grades, solutions, and hints when revisiting old problems. Choose hiding or blur, and use Peek to reveal loaded content. New answers you type are preserved; recorded grades and submission history are unchanged. Off by default.
+- **Question actions:** Clear answer fields, open Piazza, search for resources, or configure a custom search link.
+- **Limited-attempt warnings:** Confirm before submitting a problem with limited attempts.
 
-Custom variables can contain numbers or expressions. For example, defining `b = -1` and `a = 2b` expands `a` to `(2*(-1))`. Unknown symbols remain symbolic, and multiplication is inserted where needed in nested definitions. Function names and scientific notation are preserved.
+Change features in the extension popup or onboarding page. Most changes require refreshing WeBWorK; Study Mode updates immediately.
 
-Circular definitions are rejected. Expansion also stops with an error above 32 nested variables or 20,000 output characters. If expansion fails during submission, no answers are rewritten and the submission is stopped. Use explicit parentheses for complex function arguments.
+## Installation
 
-Run the expansion tests with `node --test tests/variable-substitution.test.cjs`.
+Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/webworker/cokogomdladilchdakkknehhnnoipbke), or load the source locally:
 
-# Libraries
+1. Clone this repository or download and extract its ZIP.
 
-This extension makes use of the following open source libraries:
+   ![Download ZIP from GitHub](https://github.com/user-attachments/assets/5bd07a09-0d03-4bf1-8bca-6340b37f291d)
 
-- jQuery 
-- KaTeX
-- MathJax
-	- The WeBWorK platform already uses MathJax to render its own equations, so this extension uses WeBWorK's instance of MathJax
-- AsciiMath
-	- This extension uses a modified version of the ASCIIMathTeXImg.js file that returns a LaTeX string for a given AsciiMath input. The set of accepted AsciiMath inputs is heavily modified to reflect the functions actually supported by WeBWorK as listed here: https://webwork.maa.org/wiki/Available_Functions
+2. Open `chrome://extensions` and enable **Developer mode**.
+3. Click **Load unpacked** and select the folder containing `manifest.json`.
 
-# Manual Installation
+   ![Load an unpacked extension in Chrome](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/9c81413a-2950-4614-b633-e377a8442b3b)
 
-1. Go to the dropdown on the green code button, and download ZIP
-   
-	![DownloadZip](https://github.com/user-attachments/assets/5bd07a09-0d03-4bf1-8bca-6340b37f291d)
+4. Open your WeBWorK course and click the extension icon.
+5. Enable **On this site** or **On all WeBWorK sites**, then refresh the page.
 
-3. Extract the ZIP file to the desired location on your computer
-4. Go to the Extensions Page in Chrome (`chrome://extensions/`) in the URL bar
-5. Enable developer mode in the top right hand corner, and then "Load unpacked" in the top-left corner
+After changing the source, reload the extension from `chrome://extensions` and refresh open WeBWorK pages. Report problems in [GitHub issues](https://github.com/danielrbenjamin/WeBWorKer/issues).
 
-	![Screenshot 2024-01-20 221204](https://github.com/crimson-dynamo/WeBWorKer/assets/156981781/9c81413a-2950-4614-b633-e377a8442b3b)
+## Development
 
-7. Select the inner `WeBWorKer-main` folder
-8. Done!
+No build step is required. Run the automated checks with:
 
-# Acknowledgements
-Built on the shoulders of giants:
+```sh
+node --test tests/*.test.cjs
+```
+
+For browser fixtures and popup previews, run `node tests/serve-browser-checks.cjs` and open the printed local URL. The fixtures simulate Chrome APIs; also test the unpacked extension on a real WeBWorK page.
+
+Maintain release notes in `changelog.js`. Move **Unreleased** notes into a numbered entry when shipping and update `manifest.json`. Onboarding opens for fresh installs and major version increases, such as `2.x` to `3.0.0`. Minor and patch updates stay quiet. Users can disable major-update opening.
+
+## Credits
+
+WeBWorKer builds on:
+
 - [WeBWorKMathView by Noah Tajwar](https://github.com/noaht11/WeBWorKMathView)
 - [WeBWorK Parentheses Checker by James Yuzawa](https://github.com/yuzawa-san/webwork-parentheses-checker)
 - [WeBWorK AlphaLinK by Munro Anderson](https://github.com/munr0/WeBWorK-AlphaLinK)
-- [WeBWorK Spoiler Guard by Abhinav Nair (Palingenos)](https://github.com/Palingenos/Webwork-Spoiler-Guard): study-mode spoiler detection and hiding, adapted for WeBWorKer's controls and settings. The original [MIT license](LICENSES/WeBWorK%20Spoiler%20Guard%20LICENSE.txt) is included.
+- [WeBWorK Spoiler Guard by Abhinav Nair (Palingenos)](https://github.com/Palingenos/Webwork-Spoiler-Guard)
 
-# Study Mode
+Nested variable expressions were contributed by [Carson Jan](https://github.com/carsonjan) in [PR #4](https://github.com/danielrbenjamin/WeBWorKer/pull/4).
 
-Enable **Study Mode (Hide Spoilers)** in the WeBWorKer popup when you want to practice old problems. It is off by default and updates open WeBWorK pages when you change its settings.
+The extension includes KaTeX, jQuery, and a modified AsciiMath parser. Third-party license notices are in [LICENSES](LICENSES).
 
-- Independently hide revealed answers, correctness feedback, scores and attempts, or solutions and hints.
-- Clear previously filled answers locally while preserving answers you type yourself. Peek temporarily restores previous answers in untouched boxes.
-- Use **Peek** on the page or in the popup, or press **Alt+Shift+P**, to reveal and hide spoilers.
-- Turn study mode on or off for one site using the on-page controls, the popup, or **Alt+Shift+H**.
-- Choose **Hide** or **Blur (hover to reveal)** in Study mode settings. Advanced settings accept additional CSS selectors, one per line.
-- Keep answer and solution requests off in navigation and submitted forms while the corresponding hiding category is enabled.
+## License
 
-Study mode runs on `/webwork2/` and `/webwork/` pages. It changes the local display and answer fields; recorded grades and previous submissions stay on the server. Peek can only reveal content already loaded on the page. To request a solution the page has not loaded, turn off study mode and use WeBWorK's own solution controls.
+[MIT](LICENSE).
 
-After updating an unpacked extension, reload WeBWorKer from your browser's extensions page and refresh open WeBWorK pages. Other WeBWorKer features keep their existing site controls.
-
-# Development checks
-
-Run the focused screenshot and study-mode checks with `node --test tests/*.test.cjs`.
-
-For browser-rendered checks, run `node tests/serve-browser-checks.cjs` and open the printed local test URL. This fixture runs the production study-mode scripts against sample WeBWorK markup with simulated Chrome APIs. The server also provides a popup preview. These checks do not replace loading the unpacked extension and checking it against a real WeBWorK page.
+WeBWorKer is an independent extension and is not affiliated with or endorsed by the WeBWorK Project, MAA, or UBC. Use it in accordance with your course policies.
