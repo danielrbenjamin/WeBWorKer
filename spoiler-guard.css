@@ -229,3 +229,4 @@ html[data-wwh-mode="blur"][data-wwh-solutions="on"] :is(
 #wwh-panel button:hover { background: #334da3; border-color: #334da3; }
 #wwh-panel button:focus-visible { outline: 2px solid #243580; outline-offset: 3px; }
 #wwh-panel button:disabled { opacity: .5; cursor: default; }
+#wwh-panel button[hidden] { display: none; }

@@ -4,7 +4,7 @@
  */
 var SpoilerGuardConfig = (() => {
     const defaults = {
-        enabled: false,
+        enabled: true,
         answers: true,
         results: true,
         scores: true,
@@ -14,7 +14,7 @@ var SpoilerGuardConfig = (() => {
         showPanel: true,
         mode: 'hide',
         extraSelectors: '',
-        disabledHosts: []
+        activeHosts: []
     };
     const storageKey = key => 'spoilerGuard' + key[0].toUpperCase() + key.slice(1);
     const storageDefaults = Object.fromEntries(Object.entries(defaults).map(([key, value]) => [storageKey(key), value]));

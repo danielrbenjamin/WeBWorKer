@@ -15,8 +15,15 @@ document.getElementById('run').addEventListener('click', async () => {
     const radio = document.querySelector('input[type="radio"]');
     try {
         await settle();
-        check('Study mode starts off without hiding answers', visible('.correct_answer') && answer.value === '42' && !document.getElementById('wwh-panel'));
+        check('Study Mode controls start available without hiding answers', visible('.correct_answer') && answer.value === '42' && !!document.getElementById('wwh-panel'));
+        check('Only the Turn on study mode button is shown initially', document.querySelector('#wwh-panel [data-action="peek"]').hidden && document.querySelector('#wwh-panel [data-action="site"]').textContent === 'Turn on study mode');
+        await SpoilerGuardConfig.save({ enabled: false });
+        await settle();
+        check('Turning Study Mode off restores answers and removes its controls', visible('.correct_answer') && answer.value === '42' && !document.getElementById('wwh-panel'));
         await SpoilerGuardConfig.save({ enabled: true });
+        await settle();
+        check('Re-enabling controls does not activate practice', visible('.correct_answer') && answer.value === '42');
+        await message('wwh-toggle-site');
         await settle();
         check('Enabled mode hides answers, feedback, solutions and scores', ['.correct_answer', '.answer-correct', '.solution', '.progress'].every(s => !visible(s)));
         check('Old text, select and radio answers are cleared locally', answer.value === '' && select.selectedIndex === -1 && !radio.checked && radio.value === 'a');

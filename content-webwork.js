@@ -840,7 +840,7 @@ var webworkSetup = async function () {
         }
 
         // Check if the feature is enabled
-        var { clearAnswersEnabled } = await chrome.storage.sync.get({ clearAnswersEnabled: true });
+        var { clearAnswersEnabled } = await chrome.storage.sync.get({ clearAnswersEnabled: false });
         if (!clearAnswersEnabled) return;
 
         var previewAnswers = document.getElementById("previewAnswers_id");
@@ -928,7 +928,7 @@ var webworkSetup = async function () {
         console.log("[WeBWorKer] Creating Online Resources button");
 
         // Check if the feature is enabled
-        var { resourcesEnabled } = await chrome.storage.sync.get({ resourcesEnabled: true });
+        var { resourcesEnabled } = await chrome.storage.sync.get({ resourcesEnabled: false });
         if (!resourcesEnabled) return;
 
         var previewAnswers = document.getElementById("previewAnswers_id");

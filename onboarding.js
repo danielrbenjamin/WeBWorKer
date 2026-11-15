@@ -3,7 +3,7 @@ const manifest = chrome.runtime.getManifest();
 document.getElementById('version').textContent = manifest.version;
 
 const settingCopy = {
-    spoilerGuardEnabled: ['Study mode', 'Hide spoilers when revisiting old problems.'],
+    spoilerGuardEnabled: ['Study mode button', 'Hide previous answers, feedback, scores, and solutions while practicing. Turn Study Mode on from the page when you’re ready.'],
     clearAnswersEnabled: ['Clear answers button', 'Clear all answer fields with confirmation.'],
     piazzaEnabled: ['Piazza shortcut', 'Open your course discussion board.'],
     resourcesEnabled: ['Online resources', 'Add quick links for problem lookups.'],

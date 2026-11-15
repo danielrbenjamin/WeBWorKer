@@ -83,7 +83,8 @@
    * State
    * ---------------------------------------------------------------- */
 
-  const siteDisabled = () => settings.disabledHosts.includes(location.hostname);
+  // Availability (settings.enabled) is separate from opting into practice on a site.
+  const siteDisabled = () => !settings.activeHosts.includes(location.hostname);
   const hidingActive = () => siteEnabled && settings.enabled && !siteDisabled() && !peeking;
 
   function refreshSiteEnabled() {
@@ -483,6 +484,7 @@
       peekButton.dataset.active = 'false';
     }
 
+    peekButton.hidden = siteDisabled();
     peekButton.disabled = siteDisabled();
     peekButton.setAttribute('aria-pressed', String(peeking));
     peekButton.title = 'Temporarily reveal answers and feedback';
@@ -491,17 +493,18 @@
   }
 
   function togglePeek() {
+    if (siteDisabled()) return;
     peeking = !peeking;
     apply();
   }
 
   async function toggleSite() {
     peeking = false;
-    const hosts = new Set(settings.disabledHosts);
+    const hosts = new Set(settings.activeHosts);
     if (hosts.has(location.hostname)) hosts.delete(location.hostname);
     else hosts.add(location.hostname);
-    settings.disabledHosts = [...hosts];
-    await SpoilerGuardConfig.save({ disabledHosts: settings.disabledHosts });
+    settings.activeHosts = [...hosts];
+    await SpoilerGuardConfig.save({ activeHosts: settings.activeHosts });
     apply();
   }
 

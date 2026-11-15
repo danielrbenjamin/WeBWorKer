@@ -4,7 +4,7 @@ function buildSpoilerGuardSettings(masterToggle) {
     const container = document.createElement('div');
     container.className = 'spoiler-guard-options';
     const description = document.createElement('p');
-    description.textContent = 'Practice old problems without seeing previous answers or grades. Your saved grades stay unchanged.';
+    description.textContent = 'Show the Study Mode button on the page. Turn it on there to practice without previous answers or grades.';
     container.appendChild(description);
 
     const details = document.createElement('details');
@@ -112,10 +112,10 @@ function buildSpoilerGuardSettings(masterToggle) {
     peek.addEventListener('click', () => send('wwh-peek'));
     pause.addEventListener('click', async () => {
         const settings = await SpoilerGuardConfig.read();
-        const hosts = new Set(settings.disabledHosts);
+        const hosts = new Set(settings.activeHosts);
         if (hosts.has(host)) hosts.delete(host); else hosts.add(host);
-        await SpoilerGuardConfig.save({ disabledHosts: [...hosts] });
-        paused = hosts.has(host);
+        await SpoilerGuardConfig.save({ activeHosts: [...hosts] });
+        paused = !hosts.has(host);
         pause.textContent = paused ? 'Turn on study mode' : 'Turn off study mode';
         updateEnabled();
     });
@@ -123,6 +123,11 @@ function buildSpoilerGuardSettings(masterToggle) {
     container.append(actions, status);
     chrome.storage.onChanged.addListener((changes, area) => {
         if (area === 'local' && changes.weworkerSiteConfigChanged && tab) send('wwh-rescan');
+        if (area === 'sync' && changes.spoilerGuardActiveHosts) {
+            paused = !(changes.spoilerGuardActiveHosts.newValue || []).includes(host);
+            pause.textContent = paused ? 'Turn on study mode' : 'Turn off study mode';
+            updateEnabled();
+        }
     });
     fields.disabled = true;
     peek.disabled = pause.disabled = true;
@@ -145,7 +150,7 @@ function buildSpoilerGuardSettings(masterToggle) {
                     }
                 } catch { /* Other sites do not have study mode. */ }
             }
-            paused = settings.disabledHosts.includes(host);
+            paused = !settings.activeHosts.includes(host);
             pause.textContent = paused ? 'Turn on study mode' : 'Turn off study mode';
             if (!tab) status.textContent = 'Open or refresh a WeBWorK page to use Peek.';
             else if (!extensionEnabled) status.textContent = 'Enable WeBWorKer on this site to use Study Mode.';

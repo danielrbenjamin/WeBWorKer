@@ -17,7 +17,7 @@ A Chrome extension that adds math previews and other tools to WeBWorK.
 - **Variables:** Use values detected in the problem or define your own numbers and expressions. Press **Ctrl+Enter** to substitute them. Nested definitions are supported; circular definitions are rejected.
 - **Calculator sidebar:** Switch between Desmos Scientific, Desmos Graphing, and a Wolfram Alpha query form. Desmos work stays loaded while you switch tools in the open sidebar. Wolfram Alpha results open in a new tab.
 - **Question screenshots:** Copy or download an image of the question, including questions longer than the viewport.
-- **Study mode:** Optionally hide previous answers, feedback, grades, solutions, and hints when revisiting old problems. Choose hiding or blur, and use Peek to reveal loaded content. New answers you type are preserved; recorded grades and submission history are unchanged. Off by default.
+- **Study mode:** Hide previous answers, feedback, grades, solutions, and hints when revisiting old problems. Choose hiding or blur, and use Peek to reveal loaded content. New answers you type are preserved; recorded grades and submission history are unchanged. The page button is available by default; hiding stays off until you choose Turn on study mode. Disable the feature in settings to remove its button.
 - **Question actions:** Clear answer fields, open Piazza, search for resources, or configure a custom search link.
 - **Limited-attempt warnings:** Confirm before submitting a problem with limited attempts.
 

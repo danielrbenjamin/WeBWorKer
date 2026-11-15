@@ -73,7 +73,7 @@ var buildFeatureToggles = function () {
             textSpan.htmlFor = def.id;
             textSpan.className = 'setting-label';
             var labels = {
-                spoilerGuardEnabled: 'Study mode', clearAnswersEnabled: 'Clear answers button',
+                spoilerGuardEnabled: 'Study mode button', clearAnswersEnabled: 'Clear answers button',
                 piazzaEnabled: 'Piazza shortcut', resourcesEnabled: 'Online resources',
                 checkParenthesesEnabled: 'Parentheses checker', variableSubstitutionEnabled: 'Variable substitution',
                 screenshotButtonEnabled: 'Question screenshots', customQueryEnabled: 'Custom search shortcut',

@@ -52,8 +52,9 @@ function fixture(inputs = []) {
     const instrumented = source.replace(/  init\(\);\s*\}\)\(\);\s*$/, `
       window.testAPI = {
         apply, clearAnswerInputs, restoreAnswerInputs, guardForms, markTableColumns,
-        markExtraSelectors, suppressRevealRequests, togglePeek, refreshSiteEnabled,
-        setSettings(patch) { settings = { ...DEFAULTS, showPanel: false, ...patch }; siteEnabled = true; }
+        markExtraSelectors, suppressRevealRequests, togglePeek, toggleSite, refreshSiteEnabled,
+        setPanel(value) { panel = value; window.top = window; },
+        setSettings(patch) { settings = { ...DEFAULTS, activeHosts: ['school.example'], showPanel: false, ...patch }; siteEnabled = true; }
       };
     })();`);
     assert.notEqual(instrumented, source);
@@ -63,15 +64,55 @@ function fixture(inputs = []) {
     return { api, context, inputs, attrs, listeners, links, boxes, extra, stored, activation, messageListeners, storageListeners };
 }
 
-test('settings are opt-in and isolated from existing WeBWorKer preferences', async () => {
+test('Study Mode controls default on, practice defaults off, and saved settings take precedence', async () => {
     const f = fixture();
     const config = f.context.SpoilerGuardConfig;
+    assert.equal((await config.read()).enabled, true);
+    assert.equal((await config.read()).activeHosts.length, 0);
+    f.stored.spoilerGuardEnabled = false;
     assert.equal((await config.read()).enabled, false);
     f.stored.clearAnswersEnabled = false;
     await config.save({ clearAnswers: false, enabled: true });
     assert.equal(f.stored.spoilerGuardClearAnswers, false);
     assert.equal(f.stored.clearAnswersEnabled, false);
     assert.equal((await config.read()).enabled, true);
+});
+
+test('fresh settings show only the activation button without hiding or clearing answers', async () => {
+    const answer = input('42');
+    const f = fixture([answer]);
+    const buttons = { peek: { dataset: {}, setAttribute() {} }, site: {} };
+    let removed = false;
+    const panel = { dataset: {}, querySelector: selector => buttons[selector.includes('peek') ? 'peek' : 'site'], remove() { removed = true; } };
+    f.api.setSettings({ ...(await f.context.SpoilerGuardConfig.read()) });
+    f.api.setPanel(panel);
+    f.api.apply();
+    assert.equal(answer.value, '42');
+    assert.equal(f.attrs.get('data-wwh-answers'), 'off');
+    assert.equal(removed, false);
+    assert.equal(buttons.site.textContent, 'Turn on study mode');
+    assert.equal(buttons.peek.hidden, true);
+    f.api.togglePeek();
+    assert.equal(answer.value, '42');
+
+    await f.api.toggleSite();
+    assert.equal(answer.value, '');
+    assert.equal(buttons.site.textContent, 'Turn off study mode');
+    assert.equal(buttons.peek.hidden, false);
+    assert.deepEqual(Array.from(f.stored.spoilerGuardActiveHosts), ['school.example']);
+    f.api.setSettings({ ...(await f.context.SpoilerGuardConfig.read()) });
+    f.api.apply();
+    assert.equal(f.attrs.get('data-wwh-answers'), 'on');
+
+    await f.api.toggleSite();
+    assert.equal(answer.value, '42');
+    assert.equal(buttons.site.textContent, 'Turn on study mode');
+    assert.equal(buttons.peek.hidden, true);
+
+    f.api.setSettings({ enabled: false });
+    f.api.apply();
+    assert.equal(removed, true);
+    assert.equal(answer.value, '42');
 });
 
 test('Peek restores old text answers and clears them again on re-hide', () => {
