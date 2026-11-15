@@ -19,6 +19,7 @@ function fixture(inputs = []) {
     const boxes = [];
     const extra = [];
     const stored = {};
+    const activation = { enabled: true };
     const document = {
         documentElement: { setAttribute: (k, v) => attrs.set(k, v), removeAttribute: k => attrs.delete(k) },
         body: {},
@@ -39,7 +40,10 @@ function fixture(inputs = []) {
                 sync: { async get(defaults) { return { ...defaults, ...stored }; }, async set(patch) { Object.assign(stored, patch); } },
                 onChanged: { addListener: listener => storageListeners.push(listener) }
             },
-            runtime: { onMessage: { addListener: listener => messageListeners.push(listener) } }
+            runtime: {
+                onMessage: { addListener: listener => messageListeners.push(listener) },
+                sendMessage(message, callback) { callback({ ok: true, enabled: activation.enabled }); }
+            }
         }
     });
     vm.runInContext(fs.readFileSync(path.join(rootDir, 'spoiler-guard-config.js'), 'utf8'), context);
@@ -48,15 +52,15 @@ function fixture(inputs = []) {
     const instrumented = source.replace(/  init\(\);\s*\}\)\(\);\s*$/, `
       window.testAPI = {
         apply, clearAnswerInputs, restoreAnswerInputs, guardForms, markTableColumns,
-        markExtraSelectors, suppressRevealRequests, togglePeek,
-        setSettings(patch) { settings = { ...DEFAULTS, showPanel: false, ...patch }; }
+        markExtraSelectors, suppressRevealRequests, togglePeek, refreshSiteEnabled,
+        setSettings(patch) { settings = { ...DEFAULTS, showPanel: false, ...patch }; siteEnabled = true; }
       };
     })();`);
     assert.notEqual(instrumented, source);
     vm.runInContext(instrumented, context);
     const api = context.window.testAPI;
     api.setSettings({ enabled: true });
-    return { api, context, inputs, attrs, listeners, links, boxes, extra, stored, messageListeners, storageListeners };
+    return { api, context, inputs, attrs, listeners, links, boxes, extra, stored, activation, messageListeners, storageListeners };
 }
 
 test('settings are opt-in and isolated from existing WeBWorKer preferences', async () => {
@@ -190,4 +194,39 @@ test('Spoiler Guard does not respond to screenshot and side panel messages', () 
         f.messageListeners[0]({ type }, {}, () => { replied = true; });
         assert.equal(replied, false);
     }
+});
+
+test('disabling WeBWorKer restores hidden content and previous answers without clearing the study preference', async () => {
+    const answer = input('42');
+    const f = fixture([answer]);
+    f.api.apply();
+    assert.equal(answer.value, '');
+    f.activation.enabled = false;
+    await f.api.refreshSiteEnabled();
+    assert.equal(answer.value, '42');
+    assert.equal(f.attrs.get('data-wwh-answers'), 'off');
+    f.activation.enabled = true;
+    await f.api.refreshSiteEnabled();
+    assert.equal(answer.value, '');
+    assert.equal(f.attrs.get('data-wwh-answers'), 'on');
+});
+
+test('Study Mode cannot become active while the extension is disabled', async () => {
+    const answer = input('42');
+    const f = fixture([answer]);
+    f.activation.enabled = false;
+    await f.api.refreshSiteEnabled();
+    f.storageListeners[0]({ spoilerGuardEnabled: { newValue: true } }, 'sync');
+    assert.equal(answer.value, '42');
+    assert.equal(f.attrs.get('data-wwh-answers'), 'off');
+});
+
+test('a main-toggle notification refreshes the active state', () => {
+    const answer = input('42');
+    const f = fixture([answer]);
+    f.api.apply();
+    f.activation.enabled = false;
+    f.storageListeners[0]({ weworkerSiteConfigChanged: { newValue: 'changed' } }, 'local');
+    assert.equal(answer.value, '42');
+    assert.equal(f.attrs.get('data-wwh-answers'), 'off');
 });

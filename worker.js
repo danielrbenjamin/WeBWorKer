@@ -15,7 +15,7 @@ function isMajorVersionUpdate(previousVersion, currentVersion) {
 
 chrome.runtime.onInstalled.addListener(async (details) => {
     ExtConfig.configureAction();
-    await ExtConfig.tryEnableGlobal();
+    await ExtConfig.tryEnableGlobal(true);
     
     // Open onboarding page on install or update
     if (details.reason === 'install') {
@@ -32,6 +32,20 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (!message) {
         return;
+    }
+
+    if (message.type === 'weworker.getSiteEnabled') {
+        const url = sender && (sender.url || (sender.tab && sender.tab.url));
+        if (!url || !/^https?:/.test(url)) {
+            sendResponse({ ok: true, enabled: false });
+            return;
+        }
+        Promise.all([ExtConfig.hasGlobalWebworkSite(), ExtConfig.hasWebworkSite(url)])
+            .then(([globalEnabled, siteEnabled]) => {
+                sendResponse({ ok: true, enabled: globalEnabled || siteEnabled });
+            })
+            .catch(error => sendResponse({ ok: false, enabled: false, error: error.message }));
+        return true;
     }
 
     // Handle side panel open request

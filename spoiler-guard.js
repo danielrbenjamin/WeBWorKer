@@ -76,13 +76,38 @@
   let settings = { ...DEFAULTS };
   let peeking = false;
   let panel = null;
+  let siteEnabled = false;
+  let activationRequest = 0;
 
   /* ---------------------------------------------------------------- *
    * State
    * ---------------------------------------------------------------- */
 
   const siteDisabled = () => settings.disabledHosts.includes(location.hostname);
-  const hidingActive = () => settings.enabled && !siteDisabled() && !peeking;
+  const hidingActive = () => siteEnabled && settings.enabled && !siteDisabled() && !peeking;
+
+  function refreshSiteEnabled() {
+    const request = ++activationRequest;
+    return new Promise(resolve => {
+      const update = enabled => {
+        if (request === activationRequest) {
+          siteEnabled = enabled;
+          if (!siteEnabled) peeking = false;
+          apply();
+          queueScan();
+        }
+        resolve();
+      };
+      try {
+        chrome.runtime.sendMessage({ type: 'weworker.getSiteEnabled' }, response => {
+          const failed = chrome.runtime.lastError;
+          update(!failed && response?.ok === true && response.enabled === true);
+        });
+      } catch {
+        update(false);
+      }
+    });
+  }
 
   function apply() {
     const active = hidingActive();
@@ -431,7 +456,7 @@
   }
 
   function updatePanel() {
-    if (!settings.enabled || !settings.showPanel || window.top !== window) {
+    if (!siteEnabled || !settings.enabled || !settings.showPanel || window.top !== window) {
       panel?.remove();
       panel = null;
       return;
@@ -488,7 +513,7 @@
 
   function scan() {
     if (!document.body) return;
-    if (!settings.enabled) return;
+    if (!siteEnabled || !settings.enabled) return;
     markTextSpoilers(document.body);
     markTableColumns(document.body);
     markProblemListStatus(document.body);
@@ -528,6 +553,10 @@
    * ---------------------------------------------------------------- */
 
   chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes.weworkerSiteConfigChanged) {
+      refreshSiteEnabled();
+      return;
+    }
     if (area !== 'sync') return;
     let changed = false;
     for (const [key, { newValue }] of Object.entries(changes)) {
@@ -545,11 +574,16 @@
   });
 
   chrome.runtime.onMessage.addListener((message, _sender, respond) => {
-    if (message?.type === 'wwh-peek' && settings.enabled) togglePeek();
-    if (message?.type === 'wwh-toggle-site' && settings.enabled) toggleSite();
-    if (message?.type === 'wwh-rescan') queueScan();
-    if (!['wwh-peek', 'wwh-toggle-site', 'wwh-rescan'].includes(message?.type)) return;
-    respond?.({ ok: true, peeking, host: location.hostname, enabled: settings.enabled });
+    if (message?.type === 'wwh-rescan') {
+      refreshSiteEnabled().then(() => {
+        respond?.({ ok: true, peeking, host: location.hostname, enabled: settings.enabled, siteEnabled });
+      });
+      return true;
+    }
+    if (message?.type === 'wwh-peek' && siteEnabled && settings.enabled) togglePeek();
+    if (message?.type === 'wwh-toggle-site' && siteEnabled && settings.enabled) toggleSite();
+    if (!['wwh-peek', 'wwh-toggle-site'].includes(message?.type)) return;
+    respond?.({ ok: true, peeking, host: location.hostname, enabled: settings.enabled, siteEnabled });
     return false;
   });
 
@@ -560,7 +594,7 @@
     } catch {
       // Keep the safe defaults if storage is unavailable.
     }
-    apply();
+    await refreshSiteEnabled();
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {

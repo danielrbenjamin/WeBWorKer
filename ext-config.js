@@ -50,6 +50,12 @@ var ExtConfig = new function () {
         };
     }
 
+    var notifySiteChange = async function () {
+        await chrome.storage.local.set({
+            weworkerSiteConfigChanged: Date.now() + ':' + Math.random()
+        });
+    };
+
     var registerContentScript = async function (origin) {
         var contentScriptSpec = createContentScriptSpec(origin);
         var contentScripts = await chrome.scripting.getRegisteredContentScripts({
@@ -61,6 +67,7 @@ var ExtConfig = new function () {
         } else {
             await chrome.scripting.registerContentScripts([contentScriptSpec]);
         }
+        await notifySiteChange();
     }
 
     var unregisterContentScript = async function (origin) {
@@ -68,6 +75,7 @@ var ExtConfig = new function () {
             await chrome.scripting.unregisterContentScripts({
                 "ids": [createContentScriptID(origin)]
             });
+            await notifySiteChange();
         }
     }
 
@@ -108,11 +116,16 @@ var ExtConfig = new function () {
         });
     }
 
-    this.tryEnableGlobal = async function () {
+    this.tryEnableGlobal = async function (restoring) {
+        if (restoring) {
+            var saved = await chrome.storage.local.get({ weworkerGlobalEnabled: true });
+            if (saved.weworkerGlobalEnabled === false) return false;
+        }
         // Check if we have global permissions
         if (await hasPermission("*")) {
             // Register the content script globally since we have permissions anyway
             await registerContentScript("*");
+            await chrome.storage.local.set({ weworkerGlobalEnabled: true });
             return true;
         }
         return false;
@@ -122,9 +135,9 @@ var ExtConfig = new function () {
         var origin = extractHostname(url);
 
         // Check if we have the necessary permissions
-        if (!hasPermission(origin)) {
+        if (!await hasPermission(origin)) {
             // Request permission if we don't already have it
-            var granted = await chrome.permissions.request(permissionSpec);
+            var granted = await chrome.permissions.request(createPermissionSpec(origin));
             if (!granted) {
                 return false;
             }
@@ -171,6 +184,7 @@ var ExtConfig = new function () {
 
     this.disableGlobal = async function () {
         await unregisterContentScript("*");
+        await chrome.storage.local.set({ weworkerGlobalEnabled: false });
 
         // TODO remove permission
     }

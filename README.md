@@ -23,6 +23,8 @@ A Chrome extension that adds math previews and other tools to WeBWorK.
 
 Change features in the extension popup or onboarding page. Most changes require refreshing WeBWorK; Study Mode updates immediately.
 
+The main site controls apply to every feature, including Study Mode. After disabling WeBWorKer, refresh the page to remove previously injected controls. Study Mode restores hidden content immediately.
+
 ## Installation
 
 Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/webworker/cokogomdladilchdakkknehhnnoipbke), or load the source locally:

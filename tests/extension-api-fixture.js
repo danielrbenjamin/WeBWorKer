@@ -25,15 +25,20 @@
         },
         runtime: {
             onMessage: { addListener: listener => messages.push(listener) },
-            sendMessage(message, callback) { callback?.({ ok: true }); },
+            sendMessage(message, callback) { callback?.({ ok: true, enabled: true }); },
             getManifest: () => ({ version: '3.0.0' })
         },
         tabs: {
             async query() { return [{ id: 1, url: location.origin + '/webwork2/test' }]; },
             async sendMessage(id, message) {
-                let reply = { ok: true, peeking: false };
-                for (const listener of messages) listener(message, {}, result => { reply = result; });
-                return reply;
+                return new Promise(resolve => {
+                    let pending = false, replied = false;
+                    for (const listener of messages) {
+                        const asyncReply = listener(message, {}, result => { replied = true; resolve(result); });
+                        pending = pending || asyncReply === true;
+                    }
+                    if (!pending && !replied) resolve({ ok: true, peeking: false, siteEnabled: true });
+                });
             },
             reload() {}, create() {}
         },

@@ -90,18 +90,21 @@ function buildSpoilerGuardSettings(masterToggle) {
     let host = '';
     let tab;
     let paused = false;
+    let extensionEnabled = false;
     const updateEnabled = () => {
-        fields.disabled = !masterToggle.checked;
-        peek.disabled = !masterToggle.checked || paused || !tab;
-        pause.disabled = !masterToggle.checked || !tab;
+        fields.disabled = !masterToggle.checked || !extensionEnabled;
+        peek.disabled = !masterToggle.checked || !extensionEnabled || paused || !tab;
+        pause.disabled = !masterToggle.checked || !extensionEnabled || !tab;
     };
     masterToggle.addEventListener('change', updateEnabled);
     const send = async type => {
         try {
             const response = await chrome.tabs.sendMessage(tab.id, { type }, { frameId: 0 });
             if (!response?.ok) throw new Error('Study mode is not running on this page.');
+            extensionEnabled = response.siteEnabled === true;
             peek.textContent = response.peeking ? 'Hide again' : 'Peek';
-            status.textContent = '';
+            status.textContent = extensionEnabled ? '' : 'Enable WeBWorKer on this site to use Study Mode.';
+            updateEnabled();
         } catch {
             status.textContent = 'Refresh this WeBWorK page to use study mode.';
         }
@@ -118,6 +121,9 @@ function buildSpoilerGuardSettings(masterToggle) {
     });
     actions.append(peek, pause);
     container.append(actions, status);
+    chrome.storage.onChanged.addListener((changes, area) => {
+        if (area === 'local' && changes.weworkerSiteConfigChanged && tab) send('wwh-rescan');
+    });
     fields.disabled = true;
     peek.disabled = pause.disabled = true;
     (async () => {
@@ -134,6 +140,7 @@ function buildSpoilerGuardSettings(masterToggle) {
                     const reply = await chrome.tabs.sendMessage(current.id, { type: 'wwh-rescan' }, { frameId: 0 });
                     if (reply?.ok) {
                         tab = current;
+                        extensionEnabled = reply.siteEnabled === true;
                         peek.textContent = reply.peeking ? 'Hide again' : 'Peek';
                     }
                 } catch { /* Other sites do not have study mode. */ }
@@ -141,6 +148,7 @@ function buildSpoilerGuardSettings(masterToggle) {
             paused = settings.disabledHosts.includes(host);
             pause.textContent = paused ? 'Turn on study mode' : 'Turn off study mode';
             if (!tab) status.textContent = 'Open or refresh a WeBWorK page to use Peek.';
+            else if (!extensionEnabled) status.textContent = 'Enable WeBWorKer on this site to use Study Mode.';
             updateEnabled();
         } catch {
             status.textContent = 'Could not load study mode settings. Reopen the popup to try again.';
