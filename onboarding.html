@@ -11,6 +11,7 @@
     <script src="ext-config.js" defer></script>
     <script src="lib/katex/katex.min.js" defer></script>
     <script src="lib/asciimath/ASCIIMathTeXImg.js" defer></script>
+    <script src="changelog.js" defer></script>
     <script src="onboarding.js" defer></script>
 </head>
 <body>
@@ -52,7 +53,6 @@
                 </div>
             </div>
         </section>
-        <aside id="updateNotice" class="release-note" hidden aria-labelledby="update-heading"><p class="eyebrow" id="update-heading">Updated to <span id="updateVersion"></span></p><ul id="updateList"></ul></aside>
         <section id="setup" class="content-section" aria-labelledby="setup-heading">
             <div class="section-heading"><p class="eyebrow">01 / Setup</p><h2 id="setup-heading">Start with your course page.</h2></div>
             <ol class="setup-steps">
@@ -77,7 +77,11 @@
             <div class="section-heading settings-heading"><div><p class="eyebrow">03 / Settings</p><h2 id="settings-heading">Keep what you use.</h2></div><p id="settings-status" role="status">Changes save automatically</p></div>
             <div id="settingsToggles" class="settings-toggles"></div>
             <p class="settings-footnote">Refresh your WeBWorK page after changing these settings. Study mode updates immediately; its detailed controls are in the toolbar popup.</p>
-            <label class="update-preference"><input type="checkbox" id="showOnUpdates"><span>Open this page after extension updates</span></label>
+            <label class="update-preference"><input type="checkbox" id="showOnUpdates"><span>Open this page for major updates only</span></label>
+        </section>
+        <section id="changelog" class="content-section" aria-labelledby="changelog-heading">
+            <div class="section-heading"><p class="eyebrow">04 / Changes</p><h2 id="changelog-heading">Changelog</h2></div>
+            <div id="changelogEntries" class="changelog-entries"></div>
         </section>
         <footer class="site-footer">
             <div class="footer-author"><span class="eyebrow">By Daniel Benjamin</span><p>More engineering &amp; software projects.</p><a class="portfolio-link" href="https://www.danielrbenjamin.com/" target="_blank" rel="noopener noreferrer">danielrbenjamin.com <span aria-hidden="true">↗</span></a></div>

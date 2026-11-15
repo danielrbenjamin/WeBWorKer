@@ -239,31 +239,34 @@ async function loadPagePreferences() {
     const checkbox = document.getElementById('showOnUpdates');
     checkbox.disabled = true;
     try {
-        const stored = await chrome.storage.local.get({ lastVersion: '', showOnboardingOnUpdate: false });
-        checkbox.checked = stored.showOnboardingOnUpdate === true;
+        const stored = await chrome.storage.local.get({ showOnboardingOnUpdate: true });
+        checkbox.checked = stored.showOnboardingOnUpdate !== false;
         checkbox.disabled = false;
         checkbox.addEventListener('change', () => saveSettings({ showOnboardingOnUpdate: checkbox.checked }, 'local'));
-        const notes = {
-            '2.2.0': ['Desmos Scientific and Graphing now open in Chrome’s side panel. Use the calculator button beside your problem.'],
-            '2.1.1': ['You can disable individual detected variables and re-enable them from the variables panel.'],
-            '2.1': ['Variable substitution can be switched off in settings.'],
-            '2.0': ['Screenshot destinations and custom variables are available in settings.']
-        };
-        if (stored.lastVersion && stored.lastVersion !== manifest.version && notes[manifest.version]) {
-            document.getElementById('updateVersion').textContent = manifest.version;
-            for (const text of notes[manifest.version]) {
-                const li = document.createElement('li');
-                li.textContent = text;
-                document.getElementById('updateList').appendChild(li);
-            }
-            document.getElementById('updateNotice').hidden = false;
-        }
-        await chrome.storage.local.set({ lastVersion: manifest.version });
     } catch {
         checkbox.closest('label').title = 'Could not load this preference. Reopen the page to try again.';
     }
 }
 
+function renderChangelog() {
+    const container = document.getElementById('changelogEntries');
+    for (const release of WeBWorKerChangelog) {
+        const entry = document.createElement('article');
+        entry.className = 'changelog-entry';
+        const version = document.createElement('h3');
+        version.textContent = release.version;
+        const list = document.createElement('ul');
+        for (const change of release.changes) {
+            const item = document.createElement('li');
+            item.textContent = change;
+            list.appendChild(item);
+        }
+        entry.append(version, list);
+        container.appendChild(entry);
+    }
+}
+
+renderChangelog();
 AMTconfig.translateOnLoad = false;
 updateMathPreview();
 buildSettingsToggles();

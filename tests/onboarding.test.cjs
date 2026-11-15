@@ -42,30 +42,54 @@ test('preview preserves literal expression characters', () => {
     assert.equal(result.tokens.map(token => token.character).join(''), expression);
 });
 
-async function updateWithPreference(preference) {
+async function updateWithPreference(preference, previousVersion = '2.2.0', currentVersion = '3.0.0', reason = 'update') {
     let installed;
     const opened = [];
     const chrome = {
-        runtime: { onInstalled: { addListener: fn => { installed = fn; } }, onMessage: { addListener() {} } },
-        commands: { onCommand: { addListener() {} } },
-        storage: { local: { get(keys, callback) { callback(preference); } } },
+        runtime: {
+            onInstalled: { addListener: fn => { installed = fn; } }, onMessage: { addListener() {} },
+            getManifest: () => ({ version: currentVersion })
+        },
+        storage: { local: { async get(defaults) { return { ...defaults, ...preference }; } } },
         tabs: { create: options => opened.push(options) }
     };
     vm.runInNewContext(fs.readFileSync(path.join(root, 'worker.js'), 'utf8'), {
         chrome, importScripts() {}, console: { log() {}, error() {} },
         ExtConfig: { configureAction() {}, async tryEnableGlobal() {} }
     });
-    await installed({ reason: 'update' });
+    await installed({ reason, previousVersion });
     return opened;
 }
 
-test('updates do not open onboarding when the preference has never been set', async () => {
-    assert.equal((await updateWithPreference({})).length, 0);
+test('major updates open the changelog by default', async () => {
+    const opened = await updateWithPreference({});
+    assert.equal(opened.length, 1);
+    assert.equal(opened[0].url, 'onboarding.html#changelog');
 });
 
-test('updates honor an explicit onboarding preference', async () => {
+test('major updates honor an explicit opt-out', async () => {
     assert.equal((await updateWithPreference({ showOnboardingOnUpdate: false })).length, 0);
     const opened = await updateWithPreference({ showOnboardingOnUpdate: true });
+    assert.equal(opened.length, 1);
+    assert.equal(opened[0].url, 'onboarding.html#changelog');
+});
+
+test('minor and patch updates never open onboarding', async () => {
+    for (const current of ['2.2.1', '2.3.0', '2.99.0']) {
+        assert.equal((await updateWithPreference({}, '2.2.0', current)).length, 0);
+        assert.equal((await updateWithPreference({ showOnboardingOnUpdate: true }, '2.2.0', current)).length, 0);
+    }
+});
+
+test('reloads, downgrades and unknown previous versions do not open onboarding', async () => {
+    for (const [previous, current] of [['3.0.0', '3.0.0'], ['3.0.0', '2.2.0'], ['', '3.0.0'], ['invalid', '3.0.0']]) {
+        assert.equal((await updateWithPreference({}, previous, current)).length, 0);
+    }
+    assert.equal((await updateWithPreference({}, '2.2.0', '3.0.0', 'chrome_update')).length, 0);
+});
+
+test('a fresh install still opens the setup page', async () => {
+    const opened = await updateWithPreference({}, '', '3.0.0', 'install');
     assert.equal(opened.length, 1);
     assert.equal(opened[0].url, 'onboarding.html');
 });

@@ -6,6 +6,13 @@ try {
     console.error(e);
 }
 
+function isMajorVersionUpdate(previousVersion, currentVersion) {
+    const valid = /^\d+(?:\.\d+){0,3}$/;
+    if (typeof previousVersion !== 'string' || typeof currentVersion !== 'string' ||
+        !valid.test(previousVersion) || !valid.test(currentVersion)) return false;
+    return Number(currentVersion.split('.')[0]) > Number(previousVersion.split('.')[0]);
+}
+
 chrome.runtime.onInstalled.addListener(async (details) => {
     ExtConfig.configureAction();
     await ExtConfig.tryEnableGlobal();
@@ -13,13 +20,12 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     // Open onboarding page on install or update
     if (details.reason === 'install') {
         chrome.tabs.create({ url: 'onboarding.html' });
-    } else if (details.reason === 'update') {
-        // Check if user wants to see onboarding on updates
-        chrome.storage.local.get(['showOnboardingOnUpdate'], (result) => {
-            if (result.showOnboardingOnUpdate === true) { // opt in; default off
-                chrome.tabs.create({ url: 'onboarding.html' });
-            }
-        });
+    } else if (details.reason === 'update' &&
+        isMajorVersionUpdate(details.previousVersion, chrome.runtime.getManifest().version)) {
+        const settings = await chrome.storage.local.get({ showOnboardingOnUpdate: true });
+        if (settings.showOnboardingOnUpdate !== false) {
+            await chrome.tabs.create({ url: 'onboarding.html#changelog' });
+        }
     }
 });
 
